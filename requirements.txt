@@ -1,0 +1,11 @@
+certifi
+chardet
+configobj
+idna
+json2html
+py-zabbix
+requests
+six
+systemd
+urllib3
+validictory
