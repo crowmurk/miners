@@ -1,42 +1,48 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Скрипт опроса майнеров. Читает из конфигурационного файла
+параметры опроса майнеров, опрашивает их, отпраляет полученную
+статистику работы майнеров на Zabbix сервер.
+Может работать как cgi скрипт (представляя статистику в виде таблиц)
 """
-Модуль для опроса майнеров.
-    Читает из конфигурационного файла параметры опроса майнеров, опрашивает их,
-    отпраляет полученную статистику работы майнеров на Zabbix сервер.
-    Может работать как cgi скрипт (представляя статистику в виде таблиц)"""
 
 __version__ = "2.6.0"
 __author__ = "varga"
 
-import sys
-import os
-import socket
 import json
 import logging
+import os
 import re
-from ipaddress import ip_address
+import socket
+import sys
+
+from collections import namedtuple
 from copy import deepcopy
 from datetime import datetime
-from collections import namedtuple
-from systemd import journal
+from ipaddress import ip_address
+from string import Template
+
+from configobj import ConfigObj, ConfigObjError
+from configobj import flatten_errors, get_extra_values
 from json2html import json2html
-from validate import Validator
-from configobj import ConfigObj, ConfigObjError, flatten_errors, get_extra_values
-from pyzabbix import ZabbixMetric, ZabbixSender
 from pyminers import Sender
+from pyzabbix import ZabbixMetric, ZabbixSender
+from systemd import journal
+from validate import Validator
 
 class ConfigParser():
     """Загружает настройки для работы скрипта"""
+
     def __init__(self, config='miners.conf'):
+        """Аргументы:
+        config: путь к файлу конфигурации
         """
-           Аргументы:
-               config: путь к файлу конфигурации"""
 
         # Шаблон файла конфигурации
         template = """
         [Script]
+            Template = string(default=miners.template.html)
             Refresh = integer(min=10, max=3600, default=30)
             Url = string(default=cgi-bin/miners.py/)
             Colorize = boolean(default=False)
@@ -57,10 +63,18 @@ class ConfigParser():
 
         # Загружаем конфигурацию
         try:
-            self.__config = ConfigObj(config, configspec=template.split('\n'), file_error=True)
+            self.__config = ConfigObj(
+                config,
+                configspec=template.split('\n'),
+                file_error=True,
+            )
         except (ConfigObjError, IOError) as e:
             # Ошибка загрузки конфигурации
-            raise IOError("could not read config file'{file}': {error}".format(file=config, error=e)) from None
+            raise IOError(
+                "could not read config file'{file}': {error}".format(
+                    file=config, error=e,
+                ),
+            ) from None
 
         # Проверяем файл конфигурации
         validator = Validator()
@@ -71,30 +85,58 @@ class ConfigParser():
             for (sections, key, result) in flatten_errors(self.__config, result):
                 if key is not None:
                     if key != 'Description':
-                        raise ValueError("the key '{key}' in the section '{section}' of config file failed validation: {result}".format(
-                            key=key, section=', '.join(sections), result=result if result else "missing key"))
+                        raise ValueError(
+                            "the key '{key}' in the section '{section}' "
+                            "of config file failed validation: "
+                            "{result}".format(
+                                key=key,
+                                section=', '.join(sections),
+                                result=result if result else "missing key",
+                            ),
+                        )
                 else:
-                    raise ValueError("the following section in config file was missing: '{section}'".format(
-                        section=', '.join(sections)))
+                    raise ValueError(
+                        "the following section in "
+                        "config file was missing: '{section}'".format(
+                            section=', '.join(sections),
+                        ),
+                    )
 
         # Проверяем на наличие дополнительных параметров
         for section, key in get_extra_values(self.__config):
-            raise ValueError("extra section or key '{key}' in section '{section}' of config file".format(
-                key=key, section=', '.join(section) if section else None))
+            raise ValueError(
+                "extra section or key '{key}' "
+                "in section '{section}' of config file".format(
+                    key=key,
+                    section=', '.join(section) if section else None,
+                ),
+            )
 
     @property
     def script(self):
-        """Параметры работы скрипта, представлены как свойства объекта"""
+        """Параметры работы скрипта,
+        представлены как свойства объекта
+        """
         try:
-            return namedtuple('script', [item.lower() for item in self.__config['Script'].keys()])(*self.__config['Script'].values())
+            properties = namedtuple(
+                'script',
+                [item.lower() for item in self.__config['Script'].keys()],
+            )
+            return properties(*self.__config['Script'].values())
         except AttributeError:
             return None
 
     @property
     def zabbix(self):
-        """Параметры Zabbix сервера, представлены как свойства объекта"""
+        """Параметры Zabbix сервера,
+        представлены как свойства объекта
+        """
         try:
-            return namedtuple('zabbix', [item.lower() for item in self.__config['Zabbix'].keys()])(*self.__config['Zabbix'].values())
+            properties = namedtuple(
+                'zabbix',
+                [item.lower() for item in self.__config['Zabbix'].keys()],
+            )
+            return properties(*self.__config['Zabbix'].values())
         except AttributeError:
             return None
 
@@ -102,40 +144,53 @@ class ConfigParser():
     def miners(self):
         """Список параметров опроса майненров в формате dict"""
         try:
-            return {item: value for item, value in self.__config.items() if item not in ['Script', 'Zabbix']}
+            return {item: value
+                    for item, value in self.__config.items()
+                    if item not in ['Script', 'Zabbix']}
         except AttributeError:
             return None
 
 
 class HtmlPage():
     """Создает html страницу с результатами опроса майнеров"""
-    def __init__(self, miners, refresh=30, url='', colorize=False):
+
+    def __init__(self, miners, template, refresh=30, url='', colorize=False):
+        """Аргументы:
+        miners: результаты опроса майнеров, в формате dict
+        с параметрами запросов и полученными ответами:
+            {'id': {'Host': str, 'Port': int, 'Miner': str,
+                    'Exchange':[{'Request': str,
+                                 'Response': dict,
+                                 'Error': bool}, ],
+                    'Description': str }, }
+            где:
+                id - netbios имя имя хоста или другой идентификатор
+                Host - ip адрес хоста
+                Port - порт майнера
+                Miner - тип майнера
+                Exchange - список запросов и ответов майнеров:
+                    Request - тип запроса
+                    Result - ответ от майнера
+                    Error - флаг успешности запроса
+                Description - описание хоста (необязательное поле)
+
+        refresh: интервал обновления страницы
+        url: относительная ссылка на скрипт
+        colorize: флаг включения подсветки критическких значений
         """
-           Аргументы:
-               miners: результаты опроса майнеров, в формате dict
-                       с параметрами запросов и полученными ответами:
-                       {'id': {'Host': str, 'Port': int, 'Miner': str,
-                           'Exchange':[{'Request': str, 'Response': dict, 'Error': bool}, ], 'Description': str }, }
-                   где:
-                       id - netbios имя имя хоста или другой идентификатор
-                       Host - ip адрес хоста
-                       Port - порт майнера
-                       Miner - тип майнера
-                       Exchange - список запросов и ответов майнеров:
-                           Request - тип запроса
-                           Result - ответ от майнера
-                           Error - флаг успешности запроса
-                       Description - описание хоста (необязательное поле)
 
-                refresh: интервал обновления страницы
-                url: относительная ссылка на скрипт
-                colorize: флаг включения подсветки критическких значений"""
+        self.__supportedMiners = {
+            'CGMiner': self.__cGMiner,
+            'ZCash': self.__zCash,
+            'Monero': self.__etherium,
+            'Etherium': self.__etherium,
+        }
 
-        self.__supportedMiners = {'CGMiner': self.__cGMiner, 'ZCash': self.__zCash,
-                                  'Monero': self.__etherium, 'Etherium': self.__etherium}
+        self.__results = {item: {'statistic': [], 'errors': []}
+                          for item in self.supportedMiners}
 
-        self.__results = {item: {'statistic': [], 'errors': []} for item in self.supportedMiners}
         self.miners = deepcopy(miners)
+        self.template = template
         self.refresh = refresh
         self.url = url
         self.colorize = colorize
@@ -155,12 +210,16 @@ class HtmlPage():
 
     @refresh.setter
     def refresh(self, value):
-        """Интервал обновления страницы,
-           должен находится в передлах от 1  до 3600 и быть целым числом"""
+        """Интервал обновления страницы, должен находится
+        в передлах от 1  до 3600 и быть целым числом
+        """
         if value in range(10, 3601):
             self.__refresh = value
         else:
-            raise ValueError("refresh = '{refresh}' refresh must be in range 10..3600".format(refresh=value))
+            raise ValueError(
+                "refresh = '{refresh}' refresh must be "
+                "in range 10..3600".format(refresh=value),
+            )
 
     @property
     def url(self):
@@ -173,16 +232,20 @@ class HtmlPage():
     @url.setter
     def url(self, value):
         """Относительная ссылка на скрипт,
-           должна быть строкой ненулевой длины"""
+        должна быть строкой ненулевой длины
+        """
         if isinstance(value, str) and value:
             self.__url = value
         else:
-            raise ValueError("url = '{url}' script url must be sting".format(url=value))
+            raise ValueError(
+                "url = '{url}' script url must be sting".format(url=value),
+            )
 
     @property
     def colorize(self):
         """Флаг включения подсветки критическких значений
-           параметров работы майнера"""
+        параметров работы майнера
+        """
         try:
             return self.__colorize
         except AttributeError:
@@ -191,45 +254,81 @@ class HtmlPage():
     @colorize.setter
     def colorize(self, value):
         """Флаг включения подсветки критическких значений
-           параметров работы майнера, должен быть True или False"""
+        параметров работы майнера, должен быть True или False
+        """
         if isinstance(value, bool):
             self.__colorize = value
         else:
-            raise ValueError("colorize = '{colorize}' flag must be boolean type".format(colorize=value))
+            raise ValueError(
+                "colorize = '{colorize}' flag must be "
+                "boolean type".format(colorize=value),
+            )
 
-    def create(self):
+    def createTables(self):
         """Создает html таблицы c результатами опроса майнеров"""
         for name, data in self.miners.items():
             # Формируем результат
-            line = {'Server': "{name} - {host}:{port}".format(name=name, host=data['Host'], port=data['Port'])}
+            line = {
+                'Server': "{name} - {host}:{port}".format(
+                    name=name,
+                    host=data['Host'],
+                    port=data['Port'],
+                ),
+            }
             # Ищем ошибки
-            errorResponses = [item['Response'] for item in data['Exchange'] if item['Error']]
+            errorResponses = [item['Response']
+                              for item in data['Exchange'] if item['Error']]
             # Преобразуем ответ от майнера
-            line.update(errorResponses[0] if errorResponses else self.__supportedMiners[data['Miner']](data['Exchange']))
-            # Добавляем описание из результатов опроса или конфигурационного файла
-            line['Description'] = data.get('Description', line.get('Description', ''))
+            line.update(
+                errorResponses[0] if errorResponses else
+                self.__supportedMiners[data['Miner']](data['Exchange']),
+            )
+            # Добавляем описание из результатов
+            # опроса или конфигурационного файла
+            line['Description'] = data.get(
+                'Description',
+                line.get('Description', ''),
+            )
             # Добавляем
-            self.__results[data['Miner']]['errors' if errorResponses else 'statistic'].append(line)
+            self.__results[data['Miner']]['errors' if errorResponses else
+                                          'statistic'].append(line)
 
         # Преобразуем в html
-        self.__results = {minerType: {resultsType: json2html.convert(json=results)
-                                      for resultsType, results in type.items() if results}
-                          for minerType, type in self.__results.items()}
+        self.__results = {
+            minerType: {
+                resultsType: json2html.convert(json=results)
+                for resultsType, results in type.items() if results}
+            for minerType, type in self.__results.items()}
 
         # Шаблон html для вывода таблиц с результатами опроса
-        table = """    <table><tr><th style="background-color: LIGHTGOLDENRODYELLOW">{miner} {type}:</th><tr></table>
-        <br>
-        {table}"""
+        table = """
+            <table>
+                <tr>
+                    <th style="background-color: LIGHTGOLDENRODYELLOW">
+                        {miner} {type}:
+                    </th>
+                <tr>
+            </table>
+            <br>
+            {table}
+        """
 
         # Содединяем таблицы
-        self.__results = '<br>\n\t'.join(table.format(miner=minerType, type=resultsType, table=results)
-                                         for minerType, type in self.__results.items()
-                                         for resultsType, results in type.items() if results)
+        self.__results = '<br>\n\t'.join(
+            table.format(
+                miner=minerType,
+                type=resultsType,
+                table=results,
+            )
+            for minerType, type in self.__results.items()
+            for resultsType, results in type.items() if results
+        )
 
     @staticmethod
     def __cGMiner(value):
         """Модифицирует ответ от сервера CGMiner
-           для удобства представления в виде html таблицы"""
+        для удобства представления в виде html таблицы
+        """
 
         if 'SUMMARY' in value[0]['Response']:
             summary = deepcopy(value[0]['Response']['SUMMARY'][0])
@@ -243,55 +342,87 @@ class HtmlPage():
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
         summary['Elapsed'] = '{}d {:02}:{:02}'.format(d, h, m)
-        summary['Last getwork'] = datetime.fromtimestamp(summary['Last getwork'])
+        summary['Last getwork'] = datetime.fromtimestamp(
+            summary['Last getwork'],
+        )
 
         # Обработка ответа
         # Шаблоны поиска
-        templates = {'Fans': '^fan[0-9]+$', 'Temps 1': '^temp[0-9]+$',
-                     'Temps 2': '^temp2_[0-9]+$', 'Temps 3': '^temp3_[0-9]+$',
-                     'Freq av': '^freq_avg[0-9]+$', 'Chainrate': '^chain_rateideal[0-9]+$'}
+        templates = {
+            'Fans': '^fan[0-9]+$',
+            'Temps 1': '^temp[0-9]+$',
+            'Temps 2': '^temp2_[0-9]+$',
+            'Temps 3': '^temp3_[0-9]+$',
+            'Freq av': '^freq_avg[0-9]+$',
+            'Chainrate': '^chain_rateideal[0-9]+$'}
         templates = {key: re.compile(item) for key, item in templates.items()}
 
         # Ищем поля по шаблону и объединяем данные
-        summary.update({key: ', '.join([str(item)
-                                        for _, item in stats.items() if bool(template.match(_)) and item])
-                        for key, template in templates.items()})
+        summary.update(
+            {key: ', '.join(
+                [str(item)
+                 for _, item in stats.items()
+                 if bool(template.match(_)) and item])
+             for key, template in templates.items()},
+        )
 
-        summary['Description'] = '{miner} - {version}'.format(miner=stats['Type'], version=stats['Miner'])
+        summary['Description'] = '{miner} - {version}'.format(
+            miner=stats['Type'],
+            version=stats['Miner'],
+        )
 
-        return {key: summary[key] for key in ['Elapsed', 'Accepted', 'Rejected', 'GHS av', 'Hardware Errors', 'Discarded',
-                                              'Device Rejected%', 'Pool Rejected%', 'Last getwork', 'Fans',
-                                              'Temps 1', 'Temps 2', 'Description']}
+        return {key: summary[key]
+                for key in [
+                    'Elapsed', 'Accepted', 'Rejected',
+                    'GHS av', 'Hardware Errors', 'Discarded',
+                    'Device Rejected%', 'Pool Rejected%',
+                    'Last getwork', 'Fans', 'Temps 1',
+                    'Temps 2', 'Description']
+                }
 
     @staticmethod
     def __zCash(value):
         """Модифицирует ответ от сервера ZCash
-           для удобства представления в виде html таблицы"""
+        для удобства представления в виде html таблицы
+        """
 
         value = deepcopy(value[0]['Response'])
 
         # Расшифровка статусов состояния GPU
-        gpuStatus = {0: 'launched', 1: 'prepare', 2: 'work', 3: 'stopped'}
+        gpuStatus = {
+            0: 'launched',
+            1: 'prepare',
+            2: 'work',
+            3: 'stopped'
+        }
 
-        """Ответ от сервера приходит в виде списка словарей, где каждый словарь -
-            статистика работы по одному GPU"""
+        """Ответ от сервера приходит в виде списка словарей,
+        где каждый словарь - статистика работы по одному GPU
+        """
 
         # Преобразуем список слоарей в словарь со списками
         value = dict(zip(value[0], zip(*[item.values() for item in value])))
         # Расшифровываем статусы GPU
         value['gpu_status'] = [gpuStatus[item] for item in value['gpu_status']]
         # Преобразуем списки в строки значений разделенные ';'
-        value = {key: '; '.join([str(item) for item in value[key]]) for key in value}
+        value = {key: '; '.join([str(item) for item in value[key]])
+                 for key in value}
         # Переименовываем и возвращаем только необходимые поля
-        return {val: value[key] for key, val in {
-            'gpu_status': 'GPU status', 'temperature': 'Temperatures',
-            'gpu_power_usage': 'GPU power usage', 'speed_sps': 'Solution / second',
-            'accepted_shares': 'Accepted shares', 'rejected_shares': 'Rejected shares'}.items()}
+        return {val: value[key]
+                for key, val in {
+                    'gpu_status': 'GPU status',
+                    'temperature': 'Temperatures',
+                    'gpu_power_usage': 'GPU power usage',
+                    'speed_sps': 'Solution / second',
+                    'accepted_shares': 'Accepted shares',
+                    'rejected_shares': 'Rejected shares'}.items()
+                }
 
     @staticmethod
     def __etherium(value):
         """Модифицирует ответ от сервера Etherium
-           для удобства представления в виде html таблицы"""
+        для удобства представления в виде html таблицы
+        """
 
         value = deepcopy(value[0]['Response'])
 
@@ -302,7 +433,9 @@ class HtmlPage():
         # Статистика ETH / DCR
         for key in ['ETH', 'DCR']:
             try:
-                percent = round(value[key]['Rejected'] * 100 / value[key]['Shares'], 2)
+                percent = round(
+                    value[key]['Rejected'] * 100 / value[key]['Shares'], 2
+                )
             except ZeroDivisionError:
                 percent = 0
 
@@ -310,97 +443,93 @@ class HtmlPage():
                 T=value[key]['Hashrate'] / 1000,
                 A=value[key]['Shares'],
                 R=value[key]['Rejected'],
-                P=percent)
+                P=percent,
+            )
 
-        value['ETH / GPU'] = '; '.join([str(item) for item in value['ETH Detailed']])
-        value['DCR / GPU'] = '; '.join([str(item) for item in value['DCR Detailed']])
+        value['ETH / GPU'] = '; '.join(
+            [str(item) for item in value['ETH Detailed']]
+        )
+        value['DCR / GPU'] = '; '.join(
+            [str(item) for item in value['DCR Detailed']]
+        )
         # Параметры GPU
-        value['GPU'] = ' '.join(['({T}C:{S}%)'.format(T=item[0], S=item[1])
-                                 for item in zip(value['GPU']['Temperatures'], value['GPU']['Fan Speeds'])])
+        value['GPU'] = ' '.join(
+            ['({T}C:{S}%)'.format(
+                T=item[0],
+                S=item[1])
+             for item in zip(
+                 value['GPU']['Temperatures'],
+                 value['GPU']['Fan Speeds'],)
+             ]
+        )
         # Информация по pool'ам
-        value['Pools'] = ' '.join(['{A}:{P}'.format(A=item['Host'], P=item['Port'])
-                                   for item in value['Pools']])
+        value['Pools'] = ' '.join(
+            ['{A}:{P}'.format(
+                A=item['Host'],
+                P=item['Port'])
+             for item in value['Pools']]
+        )
         # Возвращаем только необходимые поля, в указанном порядке
-        return {key: value[key] for key in ['Uptime', 'ETH', 'ETH / GPU', 'DCR', 'DCR / GPU', 'GPU', 'Pools']}
+        return {key: value[key]
+                for key in [
+                    'Uptime', 'ETH', 'ETH / GPU',
+                    'DCR', 'DCR / GPU', 'GPU', 'Pools']
+                }
 
     def __str__(self):
         """Формирует html страницу"""
         currentTime = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
-        return """
-<html>
-    <meta charset="utf-8">
-    <title>Miners Statistic</title>
-    <head>
-        <style>
-            p {{
-                font-size: 80%;
-                text-align: right;
-            }}
-            table {{
-                width:100%;
-            }}
-            table, th, td {{
-                border: 1px solid black;
-                border-collapse: collapse;
-            }}
-            th, td {{
-                padding: 5px;
-                text-align: center;
-            }}
-            table tr:nth-child(even) {{
-                background-color: IVORY;
-            }}
-            table tr:nth-child(odd) {{
-               background-color: LIGHTGOLDENRODYELLOW;
-            }}
-            table tr:hover {{
-                background-color: KHAKI;
-            }}
-            table th {{
-                background-color: PALEGOLDENROD;
-                color: black
-            }}
-        </style>
-        <meta http-equiv="refresh" content="{refresh}" url="{url}">
-    </head>
-    <body>
-    {tables}
-    <p>Script version: {version}. Current time: {currentTime}. Update interval: {refresh} sec.</p>
-    </body>
-</html>
-""".format(tables=self.__results, currentTime=currentTime, refresh=self.refresh, url=self.url, version=__version__)
+        # Загружаем шаблон из файла
+        with open(self.template, 'r') as file:
+            template = Template(file.read())
+            # Подставляем значения
+            return template.substitute(
+                tables=self.__results,
+                currentTime=currentTime,
+                refresh=self.refresh,
+                url=self.url,
+                version=__version__,
+            )
 
 
 class Zabbix():
     """Отправляет статистику работы майнеров на Zabbix серввер"""
-    def __init__(self, miners, server='127.0.0.1', port=10051, log='False'):
+
+    def __init__(self, miners, server='127.0.0.1',
+                 port=10051, log='False'):
+        """Аргументы:
+           miners: результаты опроса майнеров, в формате dict
+           с параметрами запросов и полученными ответами:
+               {'id': {'Host': str, 'Port': int, 'Miner': str,
+                       'Exchange':[{'Request': str, 'Response': dict,
+                                    'Error': bool}, ],
+                       'Description': str }, }
+               где:
+                   id - netbios имя имя хоста или другой идентификатор
+                   Host - ip адрес хоста
+                   Port - порт майнера
+                   Miner - тип майнера
+                   Exchange - список запросов и ответов майнеров:
+                       Request - тип запроса
+                       Result - ответ от майнера
+                       Error - флаг успешности запроса
+                   Description - описание хоста (необязательное поле)
+
+           server: адрес сервера
+           port: порт сервера
+           log: логирование результатов работы, может принимать значения:
+               False - не вести лог
+               system - записть в системный лог systemd
+               stdout - вывод в стандартный поток
+               или принимает имя файла для записи лога
         """
-           Аргументы:
-               miners: результаты опроса майнеров, в формате dict
-                       с параметрами запросов и полученными ответами:
-                       {'id': {'Host': str, 'Port': int, 'Miner': str,
-                           'Exchange':[{'Request': str, 'Response': dict, 'Error': bool}, ], 'Description': str }, }
-                   где:
-                       id - netbios имя имя хоста или другой идентификатор
-                       Host - ip адрес хоста
-                       Port - порт майнера
-                       Miner - тип майнера
-                       Exchange - список запросов и ответов майнеров:
-                           Request - тип запроса
-                           Result - ответ от майнера
-                           Error - флаг успешности запроса
-                       Description - описание хоста (необязательное поле)
 
-                server: адрес сервера
-                port: порт сервера
-                log: логирование результатов работы, может принимать значения:
-                    False - не вести лог
-                    system - записть в системный лог systemd
-                    stdout - вывод в стандартный поток
-                    или принимает имя файла для записи лога"""
-
-        self.__supportedMiners = {'CGMiner': self.__cGMiner, 'ZCash': self.__zCash,
-                                  'Monero': self.__etherium, 'Etherium': self.__etherium}
+        self.__supportedMiners = {
+            'CGMiner': self.__cGMiner,
+            'ZCash': self.__zCash,
+            'Monero': self.__etherium,
+            'Etherium': self.__etherium
+        }
 
         self.miners = deepcopy(miners)
         self.server = server
@@ -423,12 +552,19 @@ class Zabbix():
         try:
             address = ip_address(value)
         except ValueError as e:
-            raise ValueError("server = {message}".format(message=e)) from None
+            raise ValueError(
+                "server = {message}".format(message=e),
+            ) from None
 
         if address.is_private:
             self.__server = value
         else:
-            raise ValueError("server = '{address}' address does not appear to be in private network".format(address=address))
+            raise ValueError(
+                "server = '{address}' address does "
+                "not appear to be in private network".format(
+                    address=address,
+                ),
+            )
 
     @property
     def port(self):
@@ -440,11 +576,16 @@ class Zabbix():
 
     @port.setter
     def port(self, value):
-        """Порт сервера, должен находится в передлах от 1  до 65535 и быть целым числом"""
+        """Порт сервера, должен находится в
+        передлах от 1  до 65535 и быть целым числом
+        """
         if value in range(1, 65536):
             self.__port = value
         else:
-            raise ValueError("port = '{port}' port must be in range 1..65535".format(port=value))
+            raise ValueError(
+                "port = '{port}' port must be "
+                "in range 1..65535".format(port=value),
+            )
 
     @property
     def log(self):
@@ -457,12 +598,17 @@ class Zabbix():
     @log.setter
     def log(self, value):
         """log: логирование результатов работы, может принимать значения:
-               False - не вести лог
-               system - записть в системный лог systemd
-               stdout - вывод в стандартный поток
-               или принимает имя файла для записи лога"""
+        False - не вести лог
+        system - записть в системный лог systemd
+        stdout - вывод в стандартный поток
+        или принимает имя файла для записи лога
+        """
 
-        journalName = os.path.basename(__file__) if __name__ == "__main__" else __name__
+        if __name__ == "__main__":
+            journalName = os.path.basename(__file__)
+        else:
+            journalName = __name__
+
         timeformat = "%Y.%m.%d-%H:%M:%S"
 
         self.__logger = logging.getLogger(journalName)
@@ -479,11 +625,17 @@ class Zabbix():
         elif value == 'stdout':
             # Вывод лога в stdout
             handler = logging.StreamHandler(sys.stdout)
-            formatter = logging.Formatter('[%(asctime)s] %(name)s: %(levelname)s: %(message)s', timeformat)
+            formatter = logging.Formatter(
+                '[%(asctime)s] %(name)s: %(levelname)s: %(message)s',
+                timeformat,
+            )
         else:
             # Запись лога в файл
             handler = logging.FileHandler(value)
-            formatter = logging.Formatter('[%(asctime)s] %(name)s: %(levelname)s: %(message)s', timeformat)
+            formatter = logging.Formatter(
+                '[%(asctime)s] %(name)s: %(levelname)s: %(message)s',
+                timeformat,
+            )
 
         handler.setLevel(logging.INFO)
         handler.setFormatter(formatter)
@@ -502,13 +654,28 @@ class Zabbix():
         """Отправляет статистику работы майнеров на серввер"""
 
         for name, metrics in self.__metrics.items():
-            server = ZabbixSender(self.server, self.port, chunk_size=len(metrics))
+            server = ZabbixSender(
+                self.server,
+                self.port,
+                chunk_size=len(metrics),
+            )
             try:
-                self.log.info("metrics sended to {server}:{port} for {miner} ({result})".format(
-                    server=self.server, port=self.port, miner=name, result=server.send(metrics)))
+                self.log.info(
+                    "metrics sended to {server}:{port} "
+                    "for {miner} ({result})".format(
+                        server=self.server,
+                        port=self.port,
+                        miner=name,
+                        result=server.send(metrics),
+                    ),
+                )
             except socket.error as e:
-                self.log.error("error on sending metrics to {server}:{port} for {miner} ({message})".format(
-                    server=self.server, port=self.port, miner=name, message=e))
+                self.log.error(
+                    "error on sending metrics to {server}:{port} "
+                    "for {miner} ({message})".format(
+                        server=self.server,
+                        port=self.port,
+                        miner=name, message=e))
                 break
 
     def __createMetrics(self):
@@ -517,18 +684,30 @@ class Zabbix():
 
         for name, data in self.miners.items():
             # Ищем ошибки
-            errorResponses = [item['Response'] for item in data['Exchange'] if item['Error']]
+            errorResponses = [
+                item['Response']
+                for item in data['Exchange']
+                if item['Error']]
             # Если при получении статистики работы майнера произошла ошибка
             if errorResponses:
                 # Создаем соответвующую метрику
-                self.__metrics[name] = [ZabbixMetric(name, 'miner.status', 0), ]
+                self.__metrics[name] = [ZabbixMetric(
+                    name,
+                    'miner.status', 0), ]
                 # Записываем сообщение в лог
-                self.log.error("error in request for miner {name} at {host}:{port} ({message})".format(
-                    name=name, host=data['Host'], port=data['Port'], message=errorResponses[0]))
+                self.log.error(
+                    "error in request for miner {name} at "
+                    "{host}:{port} ({message})".format(
+                        name=name,
+                        host=data['Host'],
+                        port=data['Port'],
+                        message=errorResponses[0]))
             else:
                 # Создаем все метрики для майнера
-                self.__metrics[name] = [ZabbixMetric(name, key, value) for key, value in
-                                        self.__supportedMiners[data['Miner']](data['Exchange'])]
+                self.__metrics[name] = [
+                    ZabbixMetric(name, key, value)
+                    for key, value in
+                    self.__supportedMiners[data['Miner']](data['Exchange'])]
 
     @staticmethod
     def __cGMiner(value):
@@ -553,8 +732,12 @@ class Zabbix():
         metric['miner.fan.number'] = stats['fan_num']
 
         template = re.compile('^fan[0-9]+$')
-        speed = [item for _, item in stats.items() if bool(template.match(_)) and item]
-        metric['miner.fan.discovery'] = json.dumps({"data": [{"{#FANID}": str(num)} for num in range(metric['miner.fan.number'])]})
+        speed = [item for _, item in stats.items()
+                 if bool(template.match(_)) and item]
+        metric['miner.fan.discovery'] = json.dumps({
+            "data": [{"{#FANID}": str(num)}
+                     for num in range(metric['miner.fan.number'])]})
+
         for num, item in enumerate(speed):
             metric['miner.fan.speed[{fan}]'.format(fan=num)] = speed[num]
 
@@ -567,22 +750,34 @@ class Zabbix():
         metric = {}
         metric['miner.status'] = 1
         metric['miner.gpu.number'] = len(value)
-        metric['miner.shares'] = sum([item['accepted_shares'] for item in value])
-        metric['miner.shares.rejected'] = sum([item['rejected_shares'] for item in value])
+        metric['miner.shares'] = sum(
+            [item['accepted_shares'] for item in value])
+        metric['miner.shares.rejected'] = sum(
+            [item['rejected_shares'] for item in value])
         try:
-            metric['miner.shares.rejected.percent'] = round(metric['miner.shares.rejected'] * 100 / metric['miner.shares'], 4)
+            metric['miner.shares.rejected.percent'] = round(
+                metric['miner.shares.rejected'] * 100 / metric['miner.shares'], 4)
         except ZeroDivisionError:
             metric['miner.shares.rejected.percent'] = float(0)
 
-        metric['miner.gpu.discovery'] = json.dumps({"data": [{"{#GPUID}": str(num)} for num in range(metric['miner.gpu.number'])]})
+        metric['miner.gpu.discovery'] = json.dumps(
+            {"data": [{"{#GPUID}": str(num)}
+                      for num in range(metric['miner.gpu.number'])]}
+        )
 
         for num, item in enumerate(value):
-            metric['miner.gpu.status[{gpu}]'.format(gpu=num)] = item['gpu_status']
-            metric['miner.gpu.shares[{gpu}]'.format(gpu=num)] = item['accepted_shares']
-            metric['miner.gpu.shares.rejected[{gpu}]'.format(gpu=num)] = item['rejected_shares']
-            metric['miner.gpu.speed[{gpu}]'.format(gpu=num)] = item['speed_sps']
-            metric['miner.gpu.powerusage[{gpu}]'.format(gpu=num)] = item['gpu_power_usage']
-            metric['miner.gpu.temperature[{gpu}]'.format(gpu=num)] = item['temperature']
+            metric['miner.gpu.status[{gpu}]'.format(
+                gpu=num)] = item['gpu_status']
+            metric['miner.gpu.shares[{gpu}]'.format(
+                gpu=num)] = item['accepted_shares']
+            metric['miner.gpu.shares.rejected[{gpu}]'.format(
+                gpu=num)] = item['rejected_shares']
+            metric['miner.gpu.speed[{gpu}]'.format(
+                gpu=num)] = item['speed_sps']
+            metric['miner.gpu.powerusage[{gpu}]'.format(
+                gpu=num)] = item['gpu_power_usage']
+            metric['miner.gpu.temperature[{gpu}]'.format(
+                gpu=num)] = item['temperature']
 
         return metric.items()
 
@@ -593,13 +788,17 @@ class Zabbix():
         metric = {}
         metric['miner.status'] = 1
         metric['miner.uptime'] = value['Uptime'] * 60
-        metric['miner.version'] = '{type}-{version}'.format(type=value['Version']['Type'], version=value['Version']['Number'])
+        metric['miner.version'] = '{type}-{version}'.format(
+            type=value['Version']['Type'],
+            version=value['Version']['Number'],
+        )
 
         metric['miner.eth.hashrate'] = value['ETH']['Hashrate'] * 10**6
         metric['miner.eth.shares'] = value['ETH']['Shares']
         metric['miner.eth.shares.rejected'] = value['ETH']['Rejected']
         try:
-            metric['miner.eth.shares.rejected.percent'] = round(metric['miner.eth.shares.rejected'] * 100 / metric['miner.eth.shares'], 4)
+            metric['miner.eth.shares.rejected.percent'] = round(
+                metric['miner.eth.shares.rejected'] * 100 / metric['miner.eth.shares'], 4)
         except ZeroDivisionError:
             metric['miner.eth.shares.rejected.percent'] = float(0)
 
@@ -607,12 +806,16 @@ class Zabbix():
         metric['miner.dcr.shares'] = value['DCR']['Shares']
         metric['miner.dcr.shares.rejected'] = value['DCR']['Rejected']
         try:
-            metric['miner.dcr.shares.rejected.percent'] = round(metric['miner.dcr.shares.rejected'] * 100 / metric['miner.dcr.shares'], 4)
+            metric['miner.dcr.shares.rejected.percent'] = round(
+                metric['miner.dcr.shares.rejected'] * 100 / metric['miner.dcr.shares'], 4)
         except ZeroDivisionError:
             metric['miner.dcr.shares.rejected.percent'] = float(0)
 
         metric['miner.gpu.number'] = len(value['ETH Detailed'])
-        metric['miner.gpu.discovery'] = json.dumps({"data": [{"{#GPUID}": str(num)} for num in range(metric['miner.gpu.number'])]})
+        metric['miner.gpu.discovery'] = json.dumps(
+            {"data": [{"{#GPUID}": str(num)}
+                      for num in range(metric['miner.gpu.number'])]}
+        )
 
         for index, item in enumerate(value['ETH Detailed']):
             if not isinstance(item, int):
@@ -623,17 +826,22 @@ class Zabbix():
                 value['DCR Detailed'][index] = 0
 
         for num, _ in enumerate(value['ETH Detailed']):
-            metric['miner.gpu.dcr.hashrate[{gpu}]'.format(gpu=num)] = value['DCR Detailed'][num] * 10**6
-            metric['miner.gpu.eth.hashrate[{gpu}]'.format(gpu=num)] = value['ETH Detailed'][num] * 10**6
-            metric['miner.gpu.fspeed[{gpu}]'.format(gpu=num)] = value['GPU']['Fan Speeds'][num]
-            metric['miner.gpu.temperature[{gpu}]'.format(gpu=num)] = value['GPU']['Temperatures'][num]
+            metric['miner.gpu.dcr.hashrate[{gpu}]'.format(
+                gpu=num)] = value['DCR Detailed'][num] * 10**6
+            metric['miner.gpu.eth.hashrate[{gpu}]'.format(
+                gpu=num)] = value['ETH Detailed'][num] * 10**6
+            metric['miner.gpu.fspeed[{gpu}]'.format(
+                gpu=num)] = value['GPU']['Fan Speeds'][num]
+            metric['miner.gpu.temperature[{gpu}]'.format(
+                gpu=num)] = value['GPU']['Temperatures'][num]
         return metric.items()
 
 
 def main():
     """Выполняется если скрипт запущен явно а не подключен как модуль.
-       В соответвии файлом настроек опрашивает майнеры. Предназначен
-       для работы как cgi сценарий или отправки данных на Zabbix сервер."""
+    В соответвии файлом настроек опрашивает майнеры. Предназначен
+    для работы как cgi сценарий или отправки данных на Zabbix сервер.
+    """
 
     # Загружаем конфигурацию
     config = ConfigParser()
@@ -648,14 +856,22 @@ def main():
 
     # Отправляем собранные данные Zabbix серверу
     if config.zabbix.send:
-        zabbix = Zabbix(miners.union, config.zabbix.server, config.zabbix.port, config.zabbix.log)
+        zabbix = Zabbix(
+            miners.union,
+            config.zabbix.server,
+            config.zabbix.port,
+            config.zabbix.log)
         zabbix.send()
         return 0
 
     # Создаем html страницу
-    page = HtmlPage(miners.union, refresh=config.script.refresh,
-                    url=config.script.url, colorize=config.script.colorize)
-    page.create()
+    page = HtmlPage(
+        miners.union,
+        template=config.script.template,
+        refresh=config.script.refresh,
+        url=config.script.url,
+        colorize=config.script.colorize)
+    page.createTables()
 
     # Если скрипт запущен как cgi
     if 'REQUEST_METHOD' in os.environ:
