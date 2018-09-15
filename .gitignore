@@ -1,3 +1,20 @@
+### Project ###
+
+# Private configs
 pools.conf
+
+# support
 add/
 index.html
+
+### Python ###
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[co]
+
+# coverage
+.coverage
+
+# Tag files
+tags
