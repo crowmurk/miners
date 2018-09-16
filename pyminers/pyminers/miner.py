@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
-"""
-Модуль содержит реализацию класса Miner"""
+"""Модуль содержит реализацию класса Miner"""
 
 import json
 import socket
 from ipaddress import ip_address
 
+
 class Miner():
     """Отправляет запросы к майнеру в формате json"""
+
     def __init__(self, host, port, request, timeout):
+        """Аргументы:
+        host: адрес майнера
+        port: порт майнера
+        request: запрос в формате json
+        timeout: время ожидани ответа майнера
         """
-            Аргументы:
-                host: адрес майнера
-                port: порт майнера
-                request: запрос в формате json
-                timeout: время ожидани ответа майнера"""
 
         self.host = host
         self.port = port
@@ -32,11 +33,16 @@ class Miner():
 
     @error.setter
     def error(self, value):
-        """Статус последнего запроса, должен быть True или False"""
+        """Статус последнего запроса,
+        должен быть True или False
+        """
         if isinstance(value, bool):
             self.__error = value
         else:
-            raise ValueError("miner request status '{error}' must be boolean type".format(error=value))
+            raise ValueError(
+                "miner request status '{error}' "
+                "must be boolean type".format(error=value),
+            )
 
     @property
     def host(self):
@@ -52,13 +58,19 @@ class Miner():
         try:
             address = ip_address(value)
         except ValueError as e:
-            raise ValueError("miner address {message}".format(message=e)) from None
+            raise ValueError(
+                "miner address {message}".format(message=e),
+            ) from None
 
         if address.is_private:
             self.__host = value
             self.__error = False
         else:
-            raise ValueError("miner address '{address}' does not appear to be in private network".format(address=address))
+            raise ValueError(
+                "miner address '{address}' "
+                "does not appear to be in "
+                "private network".format(address=address),
+            )
 
     @property
     def port(self):
@@ -70,12 +82,17 @@ class Miner():
 
     @port.setter
     def port(self, value):
-        """Порт майнера, должен находится в передлах от 1  до 65535 и быть целым числом"""
+        """Порт майнера, должен находится в
+        передлах от 1  до 65535 и быть целым числом
+        """
         if value in range(1, 65536):
             self.__port = value
             self.__error = False
         else:
-            raise ValueError("miner port '{port}' must be in range 1..65535".format(port=value))
+            raise ValueError(
+                "miner port '{port}' must be "
+                "in range 1..65535".format(port=value),
+            )
 
     @property
     def timeout(self):
@@ -87,12 +104,17 @@ class Miner():
 
     @timeout.setter
     def timeout(self, value):
-        """Время ожидани ответа майнера, должно быть в пределах от 1 до 60 и быть целым"""
+        """Время ожидани ответа майнера, должно быть в
+        пределах от 1 до 60 и быть целым
+        """
         if value in range(1, 61):
             self.__timeout = value
             self.__error = False
         else:
-            raise ValueError("miner response timeout '{timeout}' must be in range 1..60".format(timeout=value))
+            raise ValueError(
+                "miner response timeout '{timeout}'"
+                " must be in range 1..60".format(timeout=value),
+            )
 
     @property
     def request(self):
@@ -110,7 +132,11 @@ class Miner():
             self.__request = value
             self.__error = False
         except ValueError as e:
-            raise ValueError("miner request '{request}' {message} ".format(request=value, message=e)) from None
+            raise ValueError(
+                "miner request '{request}' {message} ".format(
+                    request=value, message=e,
+                ),
+            ) from None
 
     @property
     def response(self):
@@ -131,19 +157,26 @@ class Miner():
             self.errorResponse(e, value)
 
     def errorResponse(self, error, value):
-        """Если не получен ответ от майнера или неверный формат ответа
-           заменяет ответ сообщением об ошибке и устанавливает соответвующий флаг"""
+        """Если не получен ответ от майнера или неверный
+        формат ответа заменяет ответ сообщением об ошибке
+        и устанавливает соответвующий флаг
+        """
         self.__error = True
-        self.__response = json.dumps({"error_type": type(error).__name__,
-                                      "error_data": str(value),
-                                      "error_message:": str(error)})
+        self.__response = json.dumps(
+            {
+                "error_type": type(error).__name__,
+                "error_data": str(value),
+                "error_message:": str(error),
+            },
+        )
 
     def sendRequest(self):
+        """Отправляет запрос к майнеру в формате json
+
+        return:
+        True - получен ответ от майнера
+        False - ошибка выполнения запроса, ответ не получен
         """
-            Отправляет запрос к майнеру в формате json
-               Возвращает:
-                   True: получен ответ от майнера
-                   False: ошибка выполнения запроса, ответ не получен"""
         if self.__error:
             return False
 
@@ -163,7 +196,8 @@ class Miner():
                 received += buffer
                 buffer = sock.recv(bufferSize)
         except socket.error as e:
-            # Ели ошибка, запускаем обработчик и возвращаем соответсвующий статус
+            # Ели ошибка, запускаем обработчик
+            # и возвращаем соответсвующий статус
             self.errorResponse(e, None)
             return False
         finally:

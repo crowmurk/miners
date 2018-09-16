@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Скрипт опроса майнеров. Читает из конфигурационного файла
-параметры опроса майнеров, опрашивает их, отпраляет полученную
-статистику работы майнеров на Zabbix сервер.
-Может работать как cgi скрипт (представляя статистику в виде таблиц)
+"""Скрипт опроса майнеров.
+
+Читает из конфигурационного файла параметры опроса майнеров,
+опрашивает их, отпраляет полученную статистику работы майнеров
+на Zabbix сервер.  Может работать как cgi скрипт
+(представляя статистику в виде таблиц)
 """
 
 __version__ = "2.6.0"
@@ -26,10 +28,12 @@ from string import Template
 from configobj import ConfigObj, ConfigObjError
 from configobj import flatten_errors, get_extra_values
 from json2html import json2html
-from pyminers import Sender
 from pyzabbix import ZabbixMetric, ZabbixSender
 from systemd import journal
 from validate import Validator
+
+from pyminers import Sender
+
 
 class ConfigParser():
     """Загружает настройки для работы скрипта"""
@@ -330,6 +334,8 @@ class HtmlPage():
         для удобства представления в виде html таблицы
         """
 
+        # К маинеру делается два запроса. В зависимости от
+        # того какой ответ попал в список первым назначаем переменные
         if 'SUMMARY' in value[0]['Response']:
             summary = deepcopy(value[0]['Response']['SUMMARY'][0])
             stats = deepcopy(value[1]['Response']['STATS'][0])
@@ -338,10 +344,12 @@ class HtmlPage():
             stats = deepcopy(value[0]['Response']['STATS'][0])
 
         # Обработка ответа
+        # Elapsed time
         m, _ = divmod(summary['Elapsed'], 60)
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
         summary['Elapsed'] = '{}d {:02}:{:02}'.format(d, h, m)
+
         summary['Last getwork'] = datetime.fromtimestamp(
             summary['Last getwork'],
         )
@@ -354,7 +362,8 @@ class HtmlPage():
             'Temps 2': '^temp2_[0-9]+$',
             'Temps 3': '^temp3_[0-9]+$',
             'Freq av': '^freq_avg[0-9]+$',
-            'Chainrate': '^chain_rateideal[0-9]+$'}
+            'Chainrate': '^chain_rateideal[0-9]+$',
+        }
         templates = {key: re.compile(item) for key, item in templates.items()}
 
         # Ищем поля по шаблону и объединяем данные
@@ -675,7 +684,9 @@ class Zabbix():
                     "for {miner} ({message})".format(
                         server=self.server,
                         port=self.port,
-                        miner=name, message=e))
+                        miner=name, message=e,
+                    ),
+                )
                 break
 
     def __createMetrics(self):
@@ -701,7 +712,9 @@ class Zabbix():
                         name=name,
                         host=data['Host'],
                         port=data['Port'],
-                        message=errorResponses[0]))
+                        message=errorResponses[0],
+                    ),
+                )
             else:
                 # Создаем все метрики для майнера
                 self.__metrics[name] = [
@@ -712,6 +725,8 @@ class Zabbix():
     @staticmethod
     def __cGMiner(value):
 
+        # К маинеру делается два запроса. В зависимости от
+        # того какой ответ попал в список первым назначаем переменные
         if 'SUMMARY' in value[0]['Response']:
             summary = deepcopy(value[0]['Response']['SUMMARY'][0])
             stats = deepcopy(value[1]['Response']['STATS'][0])
@@ -860,7 +875,8 @@ def main():
             miners.union,
             config.zabbix.server,
             config.zabbix.port,
-            config.zabbix.log)
+            config.zabbix.log,
+        )
         zabbix.send()
         return 0
 
@@ -870,7 +886,8 @@ def main():
         template=config.script.template,
         refresh=config.script.refresh,
         url=config.script.url,
-        colorize=config.script.colorize)
+        colorize=config.script.colorize,
+    )
     page.createTables()
 
     # Если скрипт запущен как cgi
