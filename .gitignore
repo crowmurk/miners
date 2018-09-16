@@ -18,3 +18,7 @@ __pycache__/
 
 # Tag files
 tags
+
+### Django ###
+db.sqlite3
+
