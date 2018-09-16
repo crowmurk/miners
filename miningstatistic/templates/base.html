@@ -1,0 +1,33 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            {% block title %}
+                Mining Statistic
+            {% endblock %}
+        </title>
+        <link rel="stylesheet" type="text/css" href="{% static 'site/normalize.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'site/skeleton.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'site/style.css' %}">
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container"><!-- container -->
+            <header class="row">
+                <div class="offset-by-one ten columns">
+                    <h1 class="logo">Mining Statistic</h1>
+                </div>
+            </header>
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div><!-- container -->
+        <footer>
+            <p>&copy; 2018 <a href="http://localhost">varga</a></p>
+        </footer>
+    </body>
+</html>
