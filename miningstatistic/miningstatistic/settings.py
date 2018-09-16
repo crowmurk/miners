@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+from .log_filters import ManagementFilter
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -27,16 +29,13 @@ SECRET_KEY = 'p8$p1bcrbf8$cjs32qu+ml_p(t*vr1utx*2v94id7ukmazw39y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Develop only
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = [
     # Develop only
     'localhost',
-]
-
-# Develop only
-INTERNAL_IPS = [
-    '127.0.0.1',
 ]
 
 # Application definition
@@ -53,7 +52,6 @@ INSTALLED_APPS = [
 
 # Develop only
 INSTALLED_APPS += [
-    'debug_toolbar',
     'django_extensions',
 ]
 
@@ -66,9 +64,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# Develop only
-MIDDLEWARE.insert(1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'miningstatistic.urls'
 
@@ -144,3 +139,72 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
+# Logging
+verbose = (
+    "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] "
+    "%(funcName)s [%(message)s]"
+)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'remove_migration_sql': {
+            '()': ManagementFilter,
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': verbose,
+            'datefmt': "%Y-%b-%d %H:%M:%S",
+        },
+    },
+    'handlers': {
+        'console': {
+            'filters': [
+                'remove_migration_sql',
+            ],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': [
+                'console',
+            ],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# Develop only, enable debug toolbar
+if DEBUG:
+    from debug_toolbar.panels.logging import collector
+
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+
+    INSTALLED_APPS += [
+        'debug_toolbar',
+    ]
+
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware',)
+
+    LOGGING['handlers']['ddt'] = {
+        'class': 'debug_toolbar.panels.logging.ThreadTrackingHandler',
+        'collector': collector,
+    }
+
+    LOGGING['loggers']['django']['handlers'].append('ddt')
+
+    LOGGING['loggers']['django.template'] = {
+        'handlers': [
+            'ddt',
+        ],
+        'level': 'DEBUG',
+        'propagate': False,
+    }
