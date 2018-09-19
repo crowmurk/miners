@@ -1,46 +1,43 @@
 from django.utils.text import slugify
 
 
-def get_unique_slug(instance, slugable_fields, slug_field):
+def get_unique_slug(instance, slug_field, *slugable, unique=True):
     """ Генерирует уникальный slug.
 
     Аргументы:
         instance - экземпляр модели
-        slugable_fields - строка с именем поля или
-            список полей из которых создается slug
-        slug_field - строка с именем поля в котором хранится slug.
+        slug_field - строка с именем поля в котором хранится slug
+        slugable - источник для создания slug:
+            строки для создания slug
+            строки с  именами полей экземпляра
+            значения полей экземпляра
+        unique - должен ли slug быть уникальным
 
     Возвращает строку с уникальным slug
     """
 
-    # Если получена строка
-    if isinstance(slugable_fields, (bytes, str)):
-        slugable_fields = (slugable_fields,)
-    # Если получен не итеррируемый тип
-    elif not hasattr(slugable_fields, '__iter__'):
-        raise TypeError(
-            "Sluggable field name must be list "
-            "or string, not '{}'".format(
-                type(slugable_fields).__name__
-            ),
-        )
+    # Получаем значения полей экземпляра
+    slugable = [
+        getattr(instance, field, field)
+        if isinstance(field, str)
+        else str(field) for field in slugable
+    ]
 
     # Создаем slug
-    slug = slugify('-'.join(
-        [getattr(instance, slugable_field)
-         for slugable_field in slugable_fields]
-    ))
+    slug = slugify('-'.join(slugable))
 
-    unique_slug = slug
-    extension = 1
-    ModelClass = instance.__class__
+    if unique:
+        unique_slug = slug
+        extension = 1
+        Model = instance.__class__
 
-    # Пока slug не будет уникальным
-    while ModelClass.object.all().filter(
-        slug_field=unique_slug,
-    ).exclude(pk=instance.pk).exists():
-        # Генерируем новый
-        unique_slug = '{}-{}'.format(slug, extension)
-        extension += 1
+        # Пока slug не будет уникальным
+        while Model.objects.filter(
+            **{slug_field: unique_slug},
+        ).exclude(id=instance.id).exists():
+            # Генерируем новый
+            unique_slug = '{}-{}'.format(slug, extension)
+            extension += 1
+        return unique_slug
 
-    return unique_slug
+    return slug

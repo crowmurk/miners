@@ -1,13 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from django.template.defaultfilters import slugify
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
     validate_ipv46_address
 )
 
-from core.utils import get_unique_slug
 from core.validators import validate_template
 
 # Create your models here.
@@ -34,14 +32,8 @@ class Miner(models.Model):
     def __str__(self):
         return "{name} {version}".format(
             name=self.name,
-            version=self.veersion,
+            version=self.version,
         )
-
-    def save(self, *args, **kwargs):
-        self.slug = get_unique_slug(
-            self, ('name', 'version'), 'slug',
-        )
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse(
@@ -75,7 +67,7 @@ class Request(models.Model):
         help_text='A label for URL config.',
     )
     request = models.TextField(
-        max_length=254,
+        max_length=255,
         validators=[validate_template],
     )
     response = models.TextField(
@@ -96,7 +88,7 @@ class Request(models.Model):
     class Meta:
         verbose_name = 'Supported requests'
         ordering = ['miner', 'name']
-        unique_together = (('slug', 'miner'),)
+        unique_together = (('miner', 'name'),)
 
     def __str__(self):
         return "{miner} {version} - {name}".format(
@@ -104,10 +96,6 @@ class Request(models.Model):
             version=self.miner.version,
             name=self.name,
         )
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return self.miner.get_absolute_url()
@@ -176,12 +164,6 @@ class Server(models.Model):
             miner=self.miner.name,
             version=self.miner.version,
         )
-
-    def save(self, *args, **kwargs):
-        self.slug = get_unique_slug(
-            self, 'name', 'slug',
-        )
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse(
