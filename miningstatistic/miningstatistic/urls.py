@@ -16,13 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(
+    path('', RedirectView.as_view(
+        pattern_name='miner:server:list',
+        permanent=False)),
+    path('', include('miner.urls')),
+    path('underconstruction/', TemplateView.as_view(
         template_name='site/underconstruction.html'),
         name='underconstruction'),
+    path('admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:
