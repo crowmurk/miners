@@ -168,10 +168,6 @@ article h3 {
     display: inline;
 }
 
-.latest-posts {
-    display: none;
-}
-
 @media (min-width: 550px) {
     .latest_posts {
         display: block;
