@@ -3,7 +3,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-def validate_template(value):
+def validate_json(value):
     """Проверяет сохраняемый шаблон
     """
     try:

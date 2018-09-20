@@ -6,7 +6,7 @@ from django.core.validators import (
     validate_ipv46_address
 )
 
-from core.validators import validate_template
+from core.validators import validate_json
 
 # Create your models here.
 
@@ -68,12 +68,12 @@ class Request(models.Model):
     )
     request = models.TextField(
         max_length=255,
-        validators=[validate_template],
+        validators=[validate_json],
     )
     response = models.TextField(
         blank=True,
         help_text='Response template',
-        validators=[validate_template],
+        validators=[validate_json],
     )
     description = models.CharField(
         max_length=255,
@@ -98,7 +98,13 @@ class Request(models.Model):
         )
 
     def get_absolute_url(self):
-        return self.miner.get_absolute_url()
+        return reverse(
+            'miner:miner:request:detail',
+            kwargs={
+                'request_slug': self.slug,
+                'miner_slug': self.miner.slug,
+            },
+        )
 
     def get_update_url(self):
         return reverse(

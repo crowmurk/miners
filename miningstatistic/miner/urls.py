@@ -7,6 +7,8 @@ app_name = 'miner'
 
 request = [
     path('create/', views.RequestCreate.as_view(), name='create'),
+    path('<slug:request_slug>/',
+         views.RequestDetail.as_view(), name='detail'),
     path('<slug:request_slug>/update/',
          views.RequestUpdate.as_view(), name='update'),
     path('<slug:request_slug>/delete/',
