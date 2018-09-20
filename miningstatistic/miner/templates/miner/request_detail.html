@@ -1,0 +1,36 @@
+{% extends "miner/base_miner.html" %}
+{% load prettyfy %}
+
+{% block title %}
+    {{ block.super }} - {{ request.name }}
+{% endblock %}
+
+{% block miner_content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eleven columns">
+                <h2>{{ request.name }}</h2>
+                <ul class="inline">
+                    <li><a href="{{ request.get_update_url }}" class="button">Изменить запрос</a></li>
+                    <li><a href="{{ request.get_delete_url }}" class="button">Удалить запрос</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>Запрос:</strong></dt>
+                    <dd>{{ request.name }}</dd>
+                    <dt><strong>Майнер:</strong></dt>
+                    <dd><a href="{{ request.miner.get_absolute_url }}"> {{ request.miner.name }} - {{ request.miner.version }}</a></dd>
+                    {% if request.description %}
+                        <dt><strong>Описание:</strong></dt>
+                        <dd>{{ request.description|linebreaks }}</dd>
+                    {% endif %}
+                    <dt><strong>Содержимое запроса:</strong></dt>
+                    <dd><pre><code>{{ request.request|pretty_json }}</code></pre></dd>
+                    {% if request.response %}
+                        <dt><strong>Шаблон проверки ответа:</strong></dt>
+                        <dd><pre><code>{{ request.response|pretty_json }}</code></pre></dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </article>
+{% endblock %}

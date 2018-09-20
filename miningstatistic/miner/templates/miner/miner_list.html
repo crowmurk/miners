@@ -1,0 +1,26 @@
+{% extends "miner/base_miner.html" %}
+
+{% block title %}
+    {{ block.super }} - Майнеры
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'miner:miner:create' %}" class="button button-primary">Добавить майнер</a>
+{% endblock %}
+
+{% block miner_content %}
+    <h2>Майнеры</h2>
+    <ul>
+        {% for miner in object_list %}
+            <li>
+                <a href="{{ miner.get_absolute_url }}">{{ miner.name|title }} - {{ miner.version }}</a>
+                <ul class=inline>
+                    <li><a href="{{ miner.get_update_url }}" class="button">Изменить</a></li>
+                    <li><a href="{{ miner.get_delete_url }}" class="button">Удалить</a></li>
+                </ul>
+            </li>
+        {% empty %}
+            <li><em>Майнеры отсутствуют.</em></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

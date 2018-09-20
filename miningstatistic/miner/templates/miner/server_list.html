@@ -1,0 +1,27 @@
+{% extends "miner/base_miner.html" %}
+
+{% block title %}
+    {{ block.super }} - Серверы
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'miner:server:create' %}" class="button button-primary">Добавить сервер</a>
+{% endblock %}
+
+{% block miner_content %}
+    <h2>Серверы</h2>
+    <ul>
+        {% for server in object_list %}
+            <li>
+                <a href="{{ server.get_absolute_url }}">{{ server.name|title }}
+                    : {{ server.host }}:{{ server.port }} - {{server.miner.name}} {{server.miner.version}}</a>
+                <ul class=inline>
+                    <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
+                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
+                </ul>
+            </li>
+        {% empty %}
+            <li><em>Серверы отсутствуют.</em></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

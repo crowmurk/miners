@@ -1,0 +1,35 @@
+{% extends "miner/base_miner.html" %}
+
+{% block title %}
+    {{ block.super }} - {{ server.name }}
+{% endblock %}
+
+{% block miner_content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eight columns">
+                <h2>{{ server.name }}</h2>
+                <ul class="inline">
+                    <li><a href="{{ server.get_update_url }}" class="button">Изменить сервер</a></li>
+                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить сервер</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>Сервер:</strong></dt>
+                    <dd>{{ server.name }}</dd>
+                    <dt><strong>Host:</strong></dt>
+                    <dd>{{ server.host }}</dd>
+                    <dt><strong>Port:</strong></dt>
+                    <dd>{{ server.port }}</dd>
+                    {% if server.description %}
+                        <dt><strong>Описание:</strong></dt>
+                        <dd>{{ server.description|linebreaks }}</dd>
+                    {% endif %}
+                    {% if server.miner %}
+                        <dt><strong>Установлен майнер:</strong></dt>
+                        <dd><a href="{{ server.miner.get_absolute_url }}"> {{ server.miner.name }} - {{ server.miner.version }}</a></dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </article>
+{% endblock %}
