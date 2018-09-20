@@ -19,7 +19,7 @@
             <div class="status row">
                 <div class="offset-by-eight four columns">
                     <ul class="inline">
-                        <li><a href="">Вход</a></li>
+                        <li><a href="{% url 'underconstruction' %}">Вход</a></li>
                     </ul>
                 </div>
             </div>
@@ -30,11 +30,12 @@
             </header>
             <nav>
                 <ul>
-                    <li><a href="">Статистика</a></li>
-                    <li><a href="">Майнеры</a></li>
-                    <li><a href="">Пулы</a></li>
-                    <li><a href="">Задания</a></li>
-                    <li><a href="">Контакт!</a></li>
+                    <li><a href="{% url 'underconstruction' %}">Статистика</a></li>
+                    <li><a href="{% url 'underconstruction' %}">Задания</a></li>
+                    <li><a href="{% url 'miner:server:list' %}">Серверы</a></li>
+                    <li><a href="{% url 'miner:miner:list' %}">Майнеры</a></li>
+                    <li><a href="{% url 'underconstruction' %}">Пулы</a></li>
+                    <li><a href="{% url 'underconstruction' %}">Контакт!</a></li>
                 </ul>
             </nav>
             <main>
