@@ -19,9 +19,9 @@ miner = [
     path('', views.MinerList.as_view(), name='list'),
     path('create/', views.MinerCreate.as_view(), name='create'),
     path('<slug:slug>/', views.MinerDetail.as_view(), name='detail'),
-    path('<slug:miner_slug>/', include((request, 'request'))),
     path('<slug:slug>/update/', views.MinerUpdate.as_view(), name='update'),
     path('<slug:slug>/delete/', views.MinerDelete.as_view(), name='delete'),
+    path('<slug:miner_slug>/', include((request, 'request'))),
 ]
 
 server = [
