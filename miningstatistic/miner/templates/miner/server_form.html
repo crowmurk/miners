@@ -12,9 +12,9 @@
 
 {% block content %}
     {% if server %}
-        {% display_form server.get_update_url 'Изменить сервер' %}
+        {% form server.get_update_url 'Изменить сервер' %}
     {% else %}
         {% url 'miner:server:create' as form_url %}
-        {% display_form form_url 'Создать сервер' %}
+        {% form form_url 'Создать сервер' %}
     {% endif %}
 {% endblock %}

@@ -12,10 +12,10 @@
 
 {% block content %}
     {% if request %}
-        {% display_form request.get_update_url 'Изменить запрос' %}
+        {% form request.get_update_url 'Изменить запрос' %}
     {% else %}
         {% url 'miner:request:create' as form_url %}
-        {% display_form form_url 'Создать запрос' %}
+        {% form form_url 'Создать запрос' %}
     {% endif %}
 {% endblock %}
 

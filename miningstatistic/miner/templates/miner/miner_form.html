@@ -12,10 +12,10 @@
 
 {% block content %}
     {% if miner %}
-        {% display_form miner.get_update_url 'Изменить майнер' %}
+        {% form miner.get_update_url 'Изменить майнер' %}
     {% else %}
         {% url 'miner:miner:create' as form_url %}
-        {% display_form form_url 'Создать майнер' %}
+        {% form form_url 'Создать майнер' %}
     {% endif %}
 {% endblock %}
 

@@ -7,7 +7,7 @@ register = Library()
     'core/includes/form.html',
     takes_context=True,
 )
-def display_form(context, *args, **kwargs):
+def form(context, *args, **kwargs):
     action = (args[0] if len(args) > 0
               else kwargs.get('action'))
     button = (args[1] if len(args) > 1
