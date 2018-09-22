@@ -6,7 +6,7 @@ from django.core.validators import (
     validate_ipv46_address
 )
 
-from core.validators import validate_json
+from core.validators import validate_json, ValidateSlug
 
 # Create your models here.
 
@@ -17,6 +17,12 @@ class Miner(models.Model):
         max_length=63,
         unique=True,
         editable=False,
+        validators=[
+            ValidateSlug(
+                'Miner',
+                ['name', 'version'],
+            ),
+        ],
         help_text='A label for URL config.',
     )
     description = models.CharField(
@@ -64,6 +70,12 @@ class Request(models.Model):
     slug = models.SlugField(
         max_length=31,
         editable=False,
+        validators=[
+            ValidateSlug(
+                'Request',
+                'name',
+            ),
+        ],
         help_text='A label for URL config.',
     )
     request = models.TextField(
@@ -134,6 +146,12 @@ class Server(models.Model):
         max_length=31,
         unique=True,
         editable=False,
+        validators=[
+            ValidateSlug(
+                'Server',
+                'name',
+            ),
+        ],
         help_text='A label for URL config.',
     )
     host = models.GenericIPAddressField(
