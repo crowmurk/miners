@@ -86,7 +86,7 @@ class RequestDelete(
     slug_url_kwarg = 'request_slug'
 
     def get_success_url(self):
-            return self.object.miner
+            return self.object.miner.get_absolute_url()
 
 
 class ServerList(ListView):
