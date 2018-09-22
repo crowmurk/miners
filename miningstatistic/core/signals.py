@@ -33,8 +33,19 @@ def slug_create(sender, **kwargs):
             unique=unique
         )
 
-        if slug == 'create':
-            # Будет совпадение с url создания объекта
-            raise ValidationError('Slug may not be ""create".')
+        if slug == 'create' or (
+                model_name == 'Request' and slug in (
+                    'update',
+                    'delete',
+                )):
+            # Будет совпадение с url представлений объекта
+            raise ValidationError(
+                'Slug may not be "{slug}" for object "{model}".'
+                'Try to change following fields: "{fields}":'.format(
+                    slug=slug,
+                    model=model_name,
+                    fields=', '.join(field for field in slugify),
+                ),
+            )
 
         instance.slug = slug
