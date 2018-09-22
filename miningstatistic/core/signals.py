@@ -1,6 +1,5 @@
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from django.core.exceptions import ValidationError
 
 from core.utils import get_unique_slug
 
@@ -10,14 +9,17 @@ def slug_create(sender, **kwargs):
     """
     instance = kwargs.get('instance')
 
-    model_name = instance.__class__.__name__
-
     # Аргументы вызова функции создания slug
     args = {
         'Miner': ('name', 'version', True),
         'Request': ('name', False),
         'Server': ('name', True),
     }
+
+    model_name = instance.__class__.__name__
+
+    if model_name in args and instance.slug:
+        return
 
     try:
         # Извлекаем аргументы для модели
@@ -37,15 +39,11 @@ def slug_create(sender, **kwargs):
                 model_name == 'Request' and slug in (
                     'update',
                     'delete',
-                )):
-            # Будет совпадение с url представлений объекта
-            raise ValidationError(
-                'Slug may not be "{slug}" for object "{model}".'
-                'Try to change following fields: "{fields}":'.format(
-                    slug=slug,
-                    model=model_name,
-                    fields=', '.join(field for field in slugify),
-                ),
-            )
+                )
+        ):
+            instance.slug = slug + '_'
+        else:
+            instance.slug = slug
 
-        instance.slug = slug
+        # Проверяем поля
+        instance.clean_fields()
