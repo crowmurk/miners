@@ -25,7 +25,7 @@ class Miner(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Supported miners'
+        verbose_name = 'Майнер'
         ordering = ['name', 'version']
         unique_together = (('name', 'version'),)
 
@@ -86,7 +86,7 @@ class Request(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Supported requests'
+        verbose_name = 'Запрос'
         ordering = ['miner', 'name']
         unique_together = (('miner', 'name'),)
 
@@ -159,7 +159,7 @@ class Server(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Mining servers'
+        verbose_name = 'Сервер'
         ordering = ['name']
 
     def __str__(self):
