@@ -1,0 +1,21 @@
+{% extends parent_template|default:"miner/base_miner.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }}
+    {% if request  %}
+        - Изменить запрос
+    {% else %}
+        - Создать запрос
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if request %}
+        {% display_form request.get_update_url 'Изменить запрос' %}
+    {% else %}
+        {% url 'miner:request:create' as form_url %}
+        {% display_form form_url 'Создать запрос' %}
+    {% endif %}
+{% endblock %}
+

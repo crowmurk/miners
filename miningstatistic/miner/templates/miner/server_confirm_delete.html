@@ -1,0 +1,10 @@
+{% extends parent_template|default:"miner/base_miner.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }} - Удалить сервер
+{% endblock %}
+
+{% block content %}
+    {% delete_form server.get_delete_url %}
+{% endblock %}

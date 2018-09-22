@@ -1,0 +1,10 @@
+<div class="row">
+    <div class="offset-by-two eight columns">
+        <form action="{{ action }}" method="{{ method|default:'post' }}">
+            {% csrf_token %}
+            <p>Вы действительно хотите удалить {{ object_type|lower }}: "{{ object_name }}"?</p>
+            <a href="{{ object.get_absolute_url }}" class="button button-primary">Отмена</a>
+            <button type="submit">Удалить {{ object_type }}</button>
+        </form>
+    </div>
+</div>

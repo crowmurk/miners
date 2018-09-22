@@ -1,0 +1,22 @@
+{% extends parent_template|default:"miner/base_miner.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }}
+    {% if miner %}
+        - Изменить майнер
+    {% else %}
+        - Создать майнер
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if miner %}
+        {% display_form miner.get_update_url 'Изменить майнер' %}
+    {% else %}
+        {% url 'miner:miner:create' as form_url %}
+        {% display_form form_url 'Создать майнер' %}
+    {% endif %}
+{% endblock %}
+
+
