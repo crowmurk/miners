@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block miner_content %}
+    <div class="offset-by-two ten columns">
     <h2>Серверы</h2>
     <ul>
         {% for server in object_list %}
@@ -24,4 +25,5 @@
             <li><em>Серверы отсутствуют.</em></li>
         {% endfor %}
     </ul>
+    </div>
 {% endblock %}
