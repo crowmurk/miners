@@ -26,7 +26,6 @@
             </div>
         </div>
         <div class="row">
-            {% if miner.requests.all %}
                 <section class="meta offset-by-two one-third column">
                     <h5>Поддерживаемые запросы</h5>
                     <ul>
@@ -37,13 +36,14 @@
                                     <li><a href="{{ request.get_delete_url }}" class="button">Удалить</a></li>
                                 </ul>
                             </li>
+                        {% empty %}
+                            <li><em>Запросы отсутствуют.</em></li>
                         {% endfor %}
                     </ul>
                 </section>
                 <section class="meta offset-by-two one-third column">
                     <p><a href="{{ miner.get_request_create_url }}" class="button">Добавить запрос</a></p>
                 </section>
-            {% endif %}
         </div>
     </article>
 {% endblock %}

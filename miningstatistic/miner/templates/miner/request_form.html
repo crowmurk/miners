@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if request %}
+    {% if request and request.slug %}
         {% form request.get_update_url 'Изменить запрос' %}
     {% else %}
         {% url 'miner:request:create' as form_url %}
