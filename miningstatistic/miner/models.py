@@ -6,7 +6,7 @@ from django.core.validators import (
     validate_ipv46_address
 )
 
-from core.validators import validate_json, ValidateSlug
+from core.validators import validate_json, validate_slug
 
 # Create your models here.
 
@@ -18,10 +18,7 @@ class Miner(models.Model):
         unique=True,
         editable=False,
         validators=[
-            ValidateSlug(
-                'Miner',
-                ['name', 'version'],
-            ),
+            validate_slug,
         ],
         help_text='URL идентификатор объекта',
     )
@@ -71,21 +68,22 @@ class Request(models.Model):
         max_length=31,
         editable=False,
         validators=[
-            ValidateSlug(
-                'Request',
-                'name',
-            ),
+            validate_slug,
         ],
         help_text='URL идентификатор объекта',
     )
     request = models.TextField(
         max_length=255,
-        validators=[validate_json],
+        validators=[
+            validate_json,
+        ],
     )
     response = models.TextField(
         blank=True,
         help_text='Шаблон проверки ответа',
-        validators=[validate_json],
+        validators=[
+            validate_json,
+        ],
     )
     description = models.CharField(
         max_length=255,
@@ -147,10 +145,7 @@ class Server(models.Model):
         unique=True,
         editable=False,
         validators=[
-            ValidateSlug(
-                'Server',
-                'name',
-            ),
+            validate_slug,
         ],
         help_text='URL идентификатор объекта',
     )

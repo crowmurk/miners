@@ -26,16 +26,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='miner',
             name='slug',
-            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=63, unique=True, validators=[core.validators.ValidateSlug('Miner', ['name', 'version'])]),
+            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=63, unique=True, validators=[core.validators.validate_slug]),
         ),
         migrations.AlterField(
             model_name='request',
             name='slug',
-            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=31, validators=[core.validators.ValidateSlug('Request', 'name')]),
+            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=31, validators=[core.validators.validate_slug]),
         ),
         migrations.AlterField(
             model_name='server',
             name='slug',
-            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=31, unique=True, validators=[core.validators.ValidateSlug('Server', 'name')]),
+            field=models.SlugField(editable=False, help_text='A label for URL config.', max_length=31, unique=True, validators=[core.validators.validate_slug]),
         ),
     ]

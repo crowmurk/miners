@@ -26,6 +26,9 @@ def get_unique_slug(instance, slug_field, *slugable, unique=True):
     # Создаем slug
     slug = slugify('-'.join(slugable))
 
+    if slug in ('create', 'update', 'delete'):
+        slug = '_' + slug
+
     if unique:
         unique_slug = slug
         extension = 1

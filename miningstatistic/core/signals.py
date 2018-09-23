@@ -4,46 +4,34 @@ from django.dispatch import receiver
 from core.utils import get_unique_slug
 
 @receiver(pre_save)
-def slug_create(sender, **kwargs):
+def slug_create(sender, instance, *args, **kwargs):
     """Создает slug при сохранении объекта
     """
-    instance = kwargs.get('instance')
 
     # Аргументы вызова функции создания slug
     args = {
-        'Miner': ('name', 'version', True),
-        'Request': ('name', False),
-        'Server': ('name', True),
+        'Miner': ('slug', 'name', 'version', True),
+        'Request': ('slug', 'name', False),
+        'Server': ('slug', 'name', True),
     }
 
-    model_name = instance.__class__.__name__
-
-    if model_name in args and instance.slug:
-        return
+    model_name = sender.__name__
 
     try:
         # Извлекаем аргументы для модели
-        *slugify, unique = args[model_name]
+        slug_field, *slugable_fields, unique = args[model_name]
+        # Создаем slug только если он еще не задан
+        if instance.slug:
+            return None
     except KeyError:
         pass
     else:
         # Создаем slug
         slug = get_unique_slug(
             instance,
-            'slug',
-            *slugify,
+            slug_field,
+            *slugable_fields,
             unique=unique
         )
 
-        if slug == 'create' or (
-                model_name == 'Request' and slug in (
-                    'update',
-                    'delete',
-                )
-        ):
-            instance.slug = slug + '_'
-        else:
-            instance.slug = slug
-
-        # Проверяем поля
-        instance.clean_fields()
+        instance.slug = slug
