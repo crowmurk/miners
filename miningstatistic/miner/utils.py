@@ -3,23 +3,6 @@ from django.shortcuts import get_object_or_404
 from .models import Miner, Request
 
 
-class RequestFormMixin():
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        # При создании и изменении Request
-        if self.request.method in ('POST', 'PUT'):
-            # Добавляем к данным формы
-            # асоциированный майнер
-            self.miner = get_object_or_404(
-                Miner,
-                slug__iexact=self.kwargs.get(
-                    self.miner_slug_url_kwarg))
-            data = kwargs['data'].copy()
-            data.update({'miner': self.miner})
-            kwargs['data'] = data
-        return kwargs
-
-
 class MinerContextMixin():
     # Имя переданного аргумента в URLConf,
     # содержащего значение slug

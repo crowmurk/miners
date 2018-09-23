@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView,
@@ -16,7 +17,6 @@ from .forms import (
 from .utils import (
     RequestGetObjectMixin,
     MinerContextMixin,
-    RequestFormMixin,
 )
 
 # Create your views here.
@@ -47,13 +47,21 @@ class MinerDelete(DeleteView):
 
 
 class RequestCreate(
-        RequestFormMixin,
         RequestGetObjectMixin,
         MinerContextMixin,
         CreateView,
 ):
     model = Request
     form_class = RequestForm
+
+    def get_initial(self):
+        # Добавляем к начальным данным представления
+        # ассоциированный майнер
+        miner_slug = self.kwargs.get(self.miner_slug_url_kwarg)
+        self.miner = get_object_or_404(Miner, slug__iexact=miner_slug)
+        initial = {self.miner_context_object_name: self.miner, }
+        initial.update(self.initial)
+        return initial
 
 
 class RequestDetail(
