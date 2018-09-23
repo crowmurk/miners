@@ -6,7 +6,10 @@ from .models import Miner, Request
 class RequestFormMixin():
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        # При создании и изменении Request
         if self.request.method in ('POST', 'PUT'):
+            # Добавляем к данным формы
+            # асоциированный майнер
             self.miner = get_object_or_404(
                 Miner,
                 slug__iexact=self.kwargs.get(
