@@ -143,8 +143,8 @@ STATICFILES_DIRS = (
 
 # Logging
 verbose = (
-    "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] "
-    "%(funcName)s [%(message)s]"
+    "[%(asctime)s] %(log_color)s%(levelname)s%(reset)s"
+    " [%(name)s:%(lineno)s] %(funcName)s [%(cyan)s%(message)s%(reset)s]"
 )
 
 LOGGING = {
@@ -159,6 +159,14 @@ LOGGING = {
         'verbose': {
             'format': verbose,
             'datefmt': "%Y-%b-%d %H:%M:%S",
+            '()': 'colorlog.ColoredFormatter',
+            'log_colors': {
+                'DEBUG': 'bold_blue',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'bold_red',
+            },
         },
     },
     'handlers': {
@@ -172,6 +180,13 @@ LOGGING = {
     },
     'loggers': {
         'django': {
+            'handlers': [
+                'console',
+            ],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'debug': {
             'handlers': [
                 'console',
             ],
