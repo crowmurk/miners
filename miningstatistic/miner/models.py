@@ -23,7 +23,7 @@ class Miner(models.Model):
                 ['name', 'version'],
             ),
         ],
-        help_text='A label for URL config.',
+        help_text='URL идентификатор объекта',
     )
     description = models.CharField(
         max_length=255,
@@ -76,7 +76,7 @@ class Request(models.Model):
                 'name',
             ),
         ],
-        help_text='A label for URL config.',
+        help_text='URL идентификатор объекта',
     )
     request = models.TextField(
         max_length=255,
@@ -84,7 +84,7 @@ class Request(models.Model):
     )
     response = models.TextField(
         blank=True,
-        help_text='Response template',
+        help_text='Шаблон проверки ответа',
         validators=[validate_json],
     )
     description = models.CharField(
@@ -152,7 +152,7 @@ class Server(models.Model):
                 'name',
             ),
         ],
-        help_text='A label for URL config.',
+        help_text='URL идентификатор объекта',
     )
     host = models.GenericIPAddressField(
         validators=[
