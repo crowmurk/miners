@@ -16,6 +16,7 @@ from .forms import (
 from .utils import (
     RequestGetObjectMixin,
     MinerContextMixin,
+    RequestFormMixin,
 )
 
 # Create your views here.
@@ -46,6 +47,7 @@ class MinerDelete(DeleteView):
 
 
 class RequestCreate(
+        RequestFormMixin,
         RequestGetObjectMixin,
         MinerContextMixin,
         CreateView,
