@@ -22,6 +22,8 @@ class RequestForm(forms.ModelForm):
         cleaned_data = super().clean()
         slug = cleaned_data.get('slug')
         miner_obj = self.data.get('miner')
+        # Проверяем существует ли Request
+        # с таким slug и ассоциированым Miner
         exists = (
             Request.objects.filter(
                 slug__iexact=slug,
@@ -29,12 +31,13 @@ class RequestForm(forms.ModelForm):
             ).exists())
         if exists:
             raise ValidationError(
-                "Request с таким slug "
-                "и miner уже существует.")
+                "Запрос с таким slug "
+                "и майнером уже существует.")
         else:
             return cleaned_data
 
     def save(self, **kwargs):
+        # Добавляем ассоциированый Miner при сохранении
         instance = super().save(commit=False)
         instance.miner = (self.data.get('miner'))
         instance.save()
