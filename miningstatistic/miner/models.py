@@ -98,7 +98,7 @@ class Request(models.Model):
     class Meta:
         verbose_name = 'Запрос'
         ordering = ['miner', 'name']
-        unique_together = (('miner', 'name'),)
+        unique_together = (('miner', 'slug'),)
 
     def __str__(self):
         return "{miner} {version} - {name}".format(
