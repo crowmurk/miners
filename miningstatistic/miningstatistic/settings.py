@@ -196,7 +196,7 @@ LOGGING = {
     },
 }
 
-# Develop only, enable debug toolbar
+# Develop only, enable django debug toolbar
 if DEBUG:
     from debug_toolbar.panels.logging import collector
 

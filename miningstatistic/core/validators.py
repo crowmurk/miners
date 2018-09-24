@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 def validate_json(value):
-    """Проверяет сохраняемый шаблон
+    """Проверяет текстовое поле
+    на соответствие формату json
     """
     try:
         if value:
@@ -18,7 +19,7 @@ def validate_json(value):
 
 
 def validate_slug(value):
-    """Проверяет slug на допустимые значения
+    """Проверяет поле slug на допустимые значения
     """
     if value.lower() in ('create', 'update', 'delete'):
         # Будет совпадение с url представлений объекта

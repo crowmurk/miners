@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
+# Подключение django debug toolbar
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [

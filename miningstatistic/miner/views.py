@@ -55,10 +55,13 @@ class RequestCreate(
     form_class = RequestForm
 
     def get_initial(self):
-        # Добавляем к начальным данным представления
-        # ассоциированный майнер
+        """Добавляет ассоциированный с request miner
+        в контекст представления
+        """
+        # Получаем ассоциированный майнер
         miner_slug = self.kwargs.get(self.miner_slug_url_kwarg)
         self.miner = get_object_or_404(Miner, slug__iexact=miner_slug)
+        # Добавляем к начальным данным представления
         initial = {self.miner_context_object_name: self.miner, }
         initial.update(self.initial)
         return initial

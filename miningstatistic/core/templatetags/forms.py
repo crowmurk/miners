@@ -8,6 +8,9 @@ register = Library()
     takes_context=True,
 )
 def form(context, *args, **kwargs):
+    """Тег формы создания и изменения объекта.
+    """
+    # Формируем контекст для шаблона формы
     action = (args[0] if len(args) > 0
               else kwargs.get('action'))
     button = (args[1] if len(args) > 1
@@ -32,6 +35,9 @@ def form(context, *args, **kwargs):
     takes_context=True,
 )
 def delete_form(context, *args, **kwargs):
+    """Тег формы удаления объекта.
+    """
+    # Формируем контекст для шаблона формы
     action = (args[0] if len(args) > 0
               else kwargs.get('action'))
     method = (args[1] if len(args) > 1
