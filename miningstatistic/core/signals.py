@@ -3,15 +3,16 @@ from django.dispatch import receiver
 
 from core.utils import get_unique_slug
 
+
 @receiver(pre_save)
 def slug_create(sender, instance, *args, **kwargs):
-    """Создает slug при сохранении объекта
+    """Создает slug при сохранении объекта в БД
     """
 
     # Аргументы вызова функции создания slug
     args = {
         'Miner': ('slug', 'name', 'version', True),
-        'Request': ('slug', 'name', False),
+        'Request': ('slug', 'name', ('miner', )),
         'Server': ('slug', 'name', True),
     }
 
