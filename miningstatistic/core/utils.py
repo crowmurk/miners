@@ -10,7 +10,7 @@ def get_unique_slug(instance, slug_field, *slugable, unique=True):
         slugable - источник для создания slug:
             строки для создания slug
             строки с  именами полей экземпляра
-            значения полей экземпляра
+            значения для создания slug
         unique - должен ли slug быть уникальным:
             True/False - для всей модели
             field - строка с именем поля с учетом значения
@@ -46,13 +46,13 @@ def get_unique_slug(instance, slug_field, *slugable, unique=True):
             # Начинаим поиск конфилктов с 'slug'
             unique_slug = slug
 
-        # Формируем словарь для фильтрации slug
+        # Формируем словарь для фильтрации модели
         filter_dict = {slug_field: unique_slug}
 
         if not isinstance(unique, bool):
             # Если необходимо учитывать
-            # значения других полей
-            # (unique_together((slug, field, )))
+            # значения других полей, например:
+            # unique_together((slug, field, ))
             if isinstance(unique, str):
                 # Если поле только одно
                 filter_dict.update(
@@ -66,8 +66,10 @@ def get_unique_slug(instance, slug_field, *slugable, unique=True):
                 )
             else:
                 raise ValueError(
-                    "'unique' arg must be bool,"
-                    "str or iterable, not {}.".format(type(unique))
+                    "'unique' argument must be bool,"
+                    " str or iterable of str, not {}.".format(
+                        type(unique),
+                    )
                 )
 
         # Пока slug не будет уникальным
@@ -82,4 +84,4 @@ def get_unique_slug(instance, slug_field, *slugable, unique=True):
 
         return unique_slug
 
-    return slug + '-1' if conflict else slug
+    return "{}-{}".format(slug, 1) if conflict else slug
