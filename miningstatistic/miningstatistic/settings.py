@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
     'miner.apps.MinerConfig',
+    'task.apps.TaskConfig',
 ]
 
 # Develop only
