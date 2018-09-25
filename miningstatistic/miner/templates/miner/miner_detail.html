@@ -8,18 +8,16 @@
     <article>
         <div class="row">
             <div class="offset-by-two eight columns">
-                <h2>{{ miner.name }}</h2>
+                <h3>Майнер: {{ miner.name }}</h3>
                 <ul class="inline">
                     <li><a href="{{ miner.get_update_url }}" class="button">Изменить майнер</a></li>
                     <li><a href="{{ miner.get_delete_url }}" class="button">Удалить майнер</a></li>
                 </ul>
                 <dl>
-                    <dt><strong>Майнер</strong></dt>
-                    <dd>{{ miner.name }}</dd>
-                    <dt><strong>Версия</strong></dt>
+                    <dt><strong>Версия:</strong></dt>
                     <dd>{{ miner.version }}</dd>
                     {% if miner.description %}
-                        <dt><strong>Описание</strong></dt>
+                        <dt><strong>Описание:</strong></dt>
                         <dd>{{ miner.description|linebreaks }}</dd>
                     {% endif %}
                 </dl>

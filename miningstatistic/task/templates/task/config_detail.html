@@ -8,43 +8,48 @@
     <article>
         <div class="row">
             <div class="offset-by-two eight columns">
-                <h2>{{ config.name }}</h2>
+                <h3>Конфигурация: {{ config.name }}</h3>
                 <ul class="inline">
                     <li><a href="{{ config.get_update_url }}" class="button">Изменить конфигурацию</a></li>
                     <li><a href="{{ config.get_delete_url }}" class="button">Удалить конфигурацию</a></li>
                 </ul>
                 <dl>
-                    <dt><strong>Конфигурация</strong></dt>
-                    <dd>{{ config.name }}</dd>
-                    <dt><strong>Активна</strong></dt>
+                    <qdt><strong>Активна:</strong></dt>
                     {% if config.enabled %}
                         <dd>Да</dd>
                     {% else %}
                         <dd>Нет</dd>
                     {% endif %}
-                    <dt><strong>Интервал опроса серверов (сек.)</strong></dt>
+                    {% if config.description %}
+                        <dt><strong>Описание:</strong></dt>
+                        <dd>{{ config.description|linebreaks }}</dd>
+                    {% endif %}
+                </dl>
+                <h5>Основные настройки:</h5>
+                <dl>
+                    <dt><strong>Интервал опроса серверов (сек.):</strong></dt>
                     <dd>{{ config.refresh }}</dd>
+                    <dt><strong>Лог:</strong></dt>
+                    <dd>{{ config.get_log_display }}</dd>
+                    {% if config.log_file %}
+                        <dt><strong>Файл логов:</strong></dt>
+                        <dd>{{ config.log_file }}</dd>
+                    {% endif %}
+                </dl>
+                </dl>
+                <h5>Zabbix сервер:</h5>
+                <dl>
                     {% if config.zabbix_server %}
-                        <dt><strong>Zabbix сервер</strong></dt>
+                        <dt><strong>Адрес:</strong></dt>
                         <dd>{{ config.zabbix_server }}</dd>
-                        <dt><strong>Zabbix порт</strong></dt>
+                        <dt><strong>Порт:</strong></dt>
                         <dd>{{ config.zabbix_port }}</dd>
                     {% endif %}
-                    <dt><strong>Отправлять статистику Zabbix серверу</strong></dt>
+                    <dt><strong>Отправлять статистику:</strong></dt>
                     {% if config.zabbix_send %}
                         <dd>Да</dd>
                     {% else %}
                         <dd>Нет</dd>
-                    {% endif %}
-                    <dt><strong>Логи</strong></dt>
-                    <dd>{{ config.get_log_display }}</dd>
-                    {% if config.log_file %}
-                        <dt><strong>Файл логов</strong></dt>
-                        <dd>{{ config.log_file }}</dd>
-                    {% endif %}
-                    {% if config.description %}
-                        <dt><strong>Описание</strong></dt>
-                        <dd>{{ config.description }}</dd>
                     {% endif %}
                 </dl>
             </div>
