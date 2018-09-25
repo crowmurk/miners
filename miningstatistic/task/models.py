@@ -84,8 +84,10 @@ class Config(models.Model):
         ordering = ['name', ]
 
     def __str__(self):
-        return "{name}".format(
+        return "{name}-{active}: {description}".format(
             name=self.name,
+            active="Активна" if self.enabled else "Выключена",
+            description=self.description,
         )
 
     def get_absolute_url(self):
@@ -132,9 +134,13 @@ class Config(models.Model):
             ).exclude(id=self.id).get()
             if enabled:
                 raise ValidationError(
-                    _('Одновременно может быть включена'
-                      ' только одна конфигурация. В настоящее'
-                      ' время включена конфигурация "%(name)s"'),
-                    code='invalid',
-                    params={'name': enabled.name, },
+                    {
+                        'enabled': ValidationError(
+                            _('Одновременно может быть включена'
+                              ' только одна конфигурация. В настоящее'
+                              ' время включена конфигурация "%(name)s"'),
+                            code='invalid',
+                            params={'name': enabled.name, },
+                        )
+                    },
                 )
