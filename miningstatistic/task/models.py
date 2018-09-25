@@ -131,16 +131,20 @@ class Config(models.Model):
         if self.enabled:
             enabled = Config.objects.filter(
                 enabled=True,
-            ).exclude(id=self.id).get()
+            ).exclude(id=self.id)
             if enabled:
                 raise ValidationError(
                     {
                         'enabled': ValidationError(
                             _('Одновременно может быть включена'
                               ' только одна конфигурация. В настоящее'
-                              ' время включена конфигурация "%(name)s"'),
+                              ' время включена конфигурация: %(name)s'),
                             code='invalid',
-                            params={'name': enabled.name, },
+                            params={
+                                # На случай если включена не одна конфигурация
+                                'name': ', '.join(['"{}"'.format(config.name)
+                                                   for config in enabled]),
+                            },
                         )
                     },
                 )
