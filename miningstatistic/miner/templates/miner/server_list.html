@@ -14,8 +14,8 @@
     <ul>
         {% for server in object_list %}
             <li>
-                <a href="{{ server.get_absolute_url }}">{{ server.name|title }}
-                    : {{ server.host }}:{{ server.port }} - {{server.miner.name}} {{server.miner.version}}</a>
+                <a href="{{ server.get_absolute_url }}">{{ server.name|title }} - {{ server.host }}:{{ server.port }}</a>
+                ({{server.miner.name}} {{server.miner.version}})
                 <ul class=inline>
                     <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
                     <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>

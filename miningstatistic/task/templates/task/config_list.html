@@ -20,7 +20,7 @@
                         {% else %}
                             - Выключена
                         {% endif %}
-                            : {{ config.description }}
+                            ({{ config.description }})
                     <ul class=inline>
                         <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>
