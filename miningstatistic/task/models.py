@@ -81,7 +81,7 @@ class Config(models.Model):
 
     class Meta:
         verbose_name = 'Конфигурация'
-        ordering = ['name', ]
+        ordering = ['-enabled', 'name', ]
 
     def __str__(self):
         return "{name}-{active}: {description}".format(
