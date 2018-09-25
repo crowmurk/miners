@@ -14,6 +14,7 @@ def slug_create(sender, instance, *args, **kwargs):
         'Miner': ('slug', 'name', 'version', True),
         'Request': ('slug', 'name', ('miner', )),
         'Server': ('slug', 'name', True),
+        'Config': ('slug', 'name', True),
     }
 
     model_name = sender.__name__
