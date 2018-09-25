@@ -1,0 +1,10 @@
+{% extends parent_template|default:"task/base_task.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }} - Удалить конфигурацию
+{% endblock %}
+
+{% block content %}
+    {% delete_form config.get_delete_url %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends parent_template|default:"task/base_task.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }}
+    {% if config %}
+        - Изменить конфигурацию
+    {% else %}
+        - Создать конфигурацию
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if config %}
+        {% form config.get_update_url 'Изменить конфигурацию' %}
+    {% else %}
+        {% url 'task:config:create' as form_url %}
+        {% form form_url 'Создать конфигурацию' %}
+    {% endif %}
+{% endblock %}
+
+

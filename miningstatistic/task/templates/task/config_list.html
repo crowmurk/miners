@@ -1,0 +1,34 @@
+{% extends "task/base_task.html" %}
+
+{% block title %}
+    {{ block.super }} - Конфигурации
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'task:config:create' %}" class="button button-primary">Добавить конфигурацию</a>
+{% endblock %}
+
+{% block task_content %}
+    <div class="offset-by-two ten columns">
+        <h2>Конфигурации</h2>
+        <ul>
+            {% for config in object_list %}
+                <li>
+                    <a href="{{ config.get_absolute_url }}">{{ config.name|title }}</a>
+                        {% if config.enabled %}
+                            - <strong>Активна</strong>
+                        {% else %}
+                            - Выключена
+                        {% endif %}
+                            : {{ config.description }}
+                    <ul class=inline>
+                        <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
+                        <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li><em>Конфигурации отсутствуют.</em></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
