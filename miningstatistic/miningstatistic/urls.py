@@ -23,6 +23,7 @@ urlpatterns = [
         pattern_name='miner:server:list',
         permanent=False)),
     path('', include('miner.urls')),
+    path('', include('task.urls')),
     path('underconstruction/', TemplateView.as_view(
         template_name='site/underconstruction.html'),
         name='underconstruction'),
