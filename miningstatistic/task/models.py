@@ -50,6 +50,7 @@ class Config(models.Model):
     )
     zabbix_server = models.GenericIPAddressField(
         blank=True,
+        null=True,
         validators=[
             validate_ipv46_address,
         ],
@@ -108,7 +109,7 @@ class Config(models.Model):
     def clean(self):
         # Если задано логирование в файл,
         # он должен быть указан
-        if self.log == self.FILE and self.log_file is None:
+        if self.log == self.FILE and not self.log_file:
             raise ValidationError(
                 {
                     'log_file': _("Не задан файл для ведения логов."),
