@@ -1,0 +1,10 @@
+{% extends "task/base_task.html" %}
+{% load forms %}
+
+{% block title %}
+    {{ block.super }} - Удалить задание
+{% endblock %}
+
+{% block content %}
+    {% delete_form server.get_delete_url %}
+{% endblock %}

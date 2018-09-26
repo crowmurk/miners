@@ -1,0 +1,47 @@
+{% extends "task/base_task.html" %}
+
+{% block title %}
+    {{ block.super }} - Задания
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'task:server:create' %}" class="button button-primary">Добавить задание</a>
+{% endblock %}
+
+{% block task_content %}
+    <div class="offset-by-two ten columns">
+        <h2>Задания</h2>
+        <ul>
+            {% for server in object_list %}
+                <li>
+                    <a href="{{ server.get_absolute_url }}">#{{ server }}</a>
+                        (
+                        {% for request in server.requests.all %}
+                            {{ request.name }},
+                        {% endfor %}
+                        )
+                        {% if server.enabled %}
+                            - <strong>Активно</strong>
+                        {% else %}
+                            - Выключено
+                        {% endif %}
+                        {% if server.last_executed %}
+                            - {{ server.last_executed }}
+                        {% endif %}
+                        {% if server.status %}
+                            - Успех
+                        {% endif %}
+                        {% if server.status is False %}
+                            - Ошибка
+                        {% endif %}
+                    <ul class=inline>
+                        <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
+                        <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li><em>Задания отсутствуют.</em></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
