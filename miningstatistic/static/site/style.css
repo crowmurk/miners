@@ -270,3 +270,15 @@ body>footer li{
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
+
+
+/* Поле множественного выбора */
+select[multiple] {
+    height: auto;
+}
+
+/* Поле ввода текста */
+textarea {
+    height: auto;
+    width: 100%;
+}
