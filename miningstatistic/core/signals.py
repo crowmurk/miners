@@ -9,10 +9,6 @@ def slug_create(sender, instance, *args, **kwargs):
     """Создает slug при сохранении объекта в БД
     """
 
-    # Создаем slug только если он еще не задан
-    if instance.slug:
-        return None
-
     # Аргументы вызова функции создания slug
     args = {
         'miner': {
@@ -31,6 +27,10 @@ def slug_create(sender, instance, *args, **kwargs):
     try:
         # Извлекаем аргументы для модели
         slug_field, *slugable_fields, unique = args[instance_app][model_name]
+
+        # Создаем slug только если он еще не задан
+        if getattr(instance, slug_field):
+            return None
     except KeyError:
         return None
     else:
@@ -42,4 +42,4 @@ def slug_create(sender, instance, *args, **kwargs):
             unique=unique
         )
 
-        instance.slug = slug
+        setattr(instance, slug_field, slug)
