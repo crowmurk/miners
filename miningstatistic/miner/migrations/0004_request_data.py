@@ -327,7 +327,7 @@ def add_request_data(apps, schema_editor):
     Request = apps.get_model('miner', 'Request')
     Miner = apps.get_model('miner', 'Miner')
     for request in REQUESTS:
-        new_request = Request.objects.create(
+        new_request = Request(
             name=request['name'],
             request=request['request'],
             response=request['response'],
