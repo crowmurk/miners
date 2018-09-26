@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from core.utils import get_unique_slug
+
 SERVERS = [
     {
         "name": "R11",
@@ -121,13 +123,19 @@ def add_server_data(apps, schema_editor):
     Server = apps.get_model('miner', 'Server')
     Miner = apps.get_model('miner', 'Miner')
     for server in SERVERS:
-        Server.objects.create(
+        new_server = Server(
             name=server['name'],
             host=server['host'],
             port=server['port'],
             miner=Miner.objects.get(slug=server['miner']),
             description=server['description'],
         )
+        new_server.slug = get_unique_slug(
+            new_server,
+            'slug',
+            'name',
+        )
+        new_server.save()
 
 
 def remove_server_data(apps, schema_editor):

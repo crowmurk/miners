@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from core.utils import get_unique_slug
+
 CONFIGS = [
     {
         "name": "Default",
@@ -24,7 +26,7 @@ CONFIGS = [
 def add_config_data(apps, schema_editor):
     Config = apps.get_model('task', 'Config')
     for config in CONFIGS:
-        Config.objects.create(
+        new_config = Config(
             name=config['name'],
             zabbix_server=config['zabbix_server'],
             zabbix_send=config['zabbix_send'],
@@ -32,6 +34,12 @@ def add_config_data(apps, schema_editor):
             log=config['log'],
             description=config['description'],
         )
+        new_config.slug = get_unique_slug(
+            new_config,
+            'slug',
+            'name',
+        )
+        new_config.save()
 
 
 def remove_config_data(apps, schema_editor):

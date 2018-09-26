@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from core.utils import get_unique_slug
+
 
 MINERS = [
     {
@@ -29,11 +31,17 @@ MINERS = [
 def add_miner_data(apps, schema_editor):
     Miner = apps.get_model('miner', 'Miner')
     for miner in MINERS:
-        Miner.objects.create(
+        new_miner = Miner(
             name=miner['name'],
             version=miner['version'],
             description=miner['description'],
         )
+        new_miner.slug = get_unique_slug(
+            new_miner,
+            'slug',
+            'name', 'version',
+        )
+        new_miner.save()
 
 
 def remove_miner_data(apps, schema_editor):

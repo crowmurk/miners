@@ -4,6 +4,8 @@ import json
 
 from django.db import migrations
 
+from core.utils import get_unique_slug
+
 
 REQUESTS = [
     {
@@ -325,13 +327,20 @@ def add_request_data(apps, schema_editor):
     Request = apps.get_model('miner', 'Request')
     Miner = apps.get_model('miner', 'Miner')
     for request in REQUESTS:
-        Request.objects.create(
+        new_request = Request.objects.create(
             name=request['name'],
             request=request['request'],
             response=request['response'],
             miner=Miner.objects.get(slug=request['miner']),
             description=request['description'],
         )
+        new_request.slug = get_unique_slug(
+            new_request,
+            'slug',
+            'name',
+            unique=('miner', )
+        )
+        new_request.save()
 
 def remove_request_data(apps, schema_editor):
     Request = apps.get_model('miner', 'Request')
