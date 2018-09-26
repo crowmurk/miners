@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 
 from core.validators import validate_slug
 
+from miner.models import Server, Request
+
 # Create your models here.
 
 class Config(models.Model):
@@ -148,3 +150,53 @@ class Config(models.Model):
                         )
                     },
                 )
+
+
+class Server(models.Model):
+    server = models.ForeignKey(
+        Server,
+        on_delete=models.CASCADE,
+        related_name='tasks'
+    )
+    requests = models.ManyToManyField(
+        Request,
+        related_name='tasks',
+    )
+    enabled = models.BooleanField(
+        default=False,
+    )
+    last_executed = models.DateTimeField(
+        null=True,
+    )
+    status = models.BooleanField(
+        null=True,
+        help_text='Результат последнего запуска',
+    )
+
+    class Meta:
+        verbose_name = 'Опрос сервера'
+        ordering = ['server', ]
+
+    def __str__(self):
+        return "{pk}: {server}".format(
+            pk=self.pk,
+            server=self.server,
+        )
+
+    def get_absolute_url(self):
+        return reverse(
+            'task:server:detail',
+            kwargs={'pk': self.pk},
+        )
+
+    def get_update_url(self):
+        return reverse(
+            'task:server:update',
+            kwargs={'pk': self.pk},
+        )
+
+    def get_delete_url(self):
+        return reverse(
+            'task:server:delete',
+            kwargs={'pk': self.pk},
+        )
