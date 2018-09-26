@@ -175,7 +175,7 @@ class Server(models.Model):
 
     class Meta:
         verbose_name = 'Опрос сервера'
-        ordering = ['server', ]
+        ordering = ['-enabled', 'server', ]
 
     def __str__(self):
         return "{pk}: {server}".format(
