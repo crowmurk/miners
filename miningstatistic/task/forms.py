@@ -14,25 +14,39 @@ class ConfigForm(forms.ModelForm):
 
         # Если задано логирование в файл,
         # он должен быть указан
-        if cleaned_data['log'] == self.Meta.model.FILE and not cleaned_data['log_file']:
-            raise forms.ValidationError(
-                {
-                    'log_file': _("Не задан файл для ведения логов."),
-                },
-                code='required',
-            )
+        if cleaned_data['log'] == self.Meta.model.FILE:
+            if not cleaned_data['log_file']:
+                self.add_error(
+                    'log_file',
+                    forms.ValidationError(
+                        _("Не задан файл для ведения логов."),
+                        code='required',
+                    ),
+                )
 
         # Если отправляется статистика на Zabbix сервер,
-        # он должен быть указан
-        if cleaned_data['zabbix_send'] and not cleaned_data['zabbix_server']:
-            raise forms.ValidationError(
-                {
-                    'zabbix_server': _("Не задан адрес Zabbix сервера."),
-                },
-                code='required',
-            )
+        # должен быть указан его адрес и порт
+        if cleaned_data['zabbix_send']:
+            if not cleaned_data['zabbix_server']:
+                self.add_error(
+                    'zabbix_server',
+                    forms.ValidationError(
+                        _("Не задан адрес Zabbix сервера."),
+                        code='required',
+                    ),
+                )
+
+            if not cleaned_data['zabbix_port']:
+                self.add_error(
+                    'zabbix_port',
+                    forms.ValidationError(
+                        _("Не задан порт Zabbix сервера."),
+                        code='required',
+                    ),
+                )
 
         return cleaned_data
+
 
 class ServerForm(forms.ModelForm):
     class Meta:

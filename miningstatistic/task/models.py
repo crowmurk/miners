@@ -58,7 +58,8 @@ class Config(models.Model):
         ],
     )
     zabbix_port = models.PositiveIntegerField(
-        default=10051,
+        blank=True,
+        null=True,
         validators=[
             MinValueValidator(0),
             MaxValueValidator(65535),
