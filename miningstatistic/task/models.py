@@ -3,7 +3,8 @@ from django.urls import reverse
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
-    validate_ipv46_address
+    validate_ipv46_address,
+    RegexValidator,
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -74,8 +75,15 @@ class Config(models.Model):
         choices=LOG_CHOICES,
         default=SYSTEM,
     )
-    log_file = models.FilePathField(
+    log_file = models.CharField(
+        max_length=4096,
         blank=True,
+        validators=[
+            RegexValidator(
+                regex=r"^/[^\0]*[^\0/]+$",
+                message="Путь к файлу должен соответствовать POSIX",
+            ),
+        ]
     )
     description = models.CharField(
         max_length=255,
