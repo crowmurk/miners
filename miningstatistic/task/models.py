@@ -111,25 +111,8 @@ class Config(models.Model):
         )
 
     def clean(self):
-        # Если задано логирование в файл,
-        # он должен быть указан
-        if self.log == self.FILE and not self.log_file:
-            raise ValidationError(
-                {
-                    'log_file': _("Не задан файл для ведения логов."),
-                },
-                code='required',
-            )
-        # Если отправляется статистика на Zabbix сервер,
-        # он должен быть указан
-        if self.zabbix_send and self.zabbix_server is None:
-            raise ValidationError(
-                {
-                    'zabbix_server': _("Не задан адрес Zabbix сервера."),
-                },
-                code='required',
-            )
-        # Одновременно может быть включена только одна конфигурация
+        # Одновременно может быть включена
+        # только одна конфигурация
         if self.enabled:
             enabled = Config.objects.filter(
                 enabled=True,
