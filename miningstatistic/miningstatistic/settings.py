@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'miner.apps.MinerConfig',
     'task.apps.TaskConfig',
+    'pool.apps.PoolConfig',
 ]
 
 # Develop only
