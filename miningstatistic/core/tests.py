@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from miner.models import Miner, Request, Server
 from core.utils import get_unique_slug
+
+from miner.models import Miner, Request, Server
+from task.models import Server as Task
 
 # Create your tests here.
 
@@ -11,7 +13,7 @@ class SlugValidatorTest(TestCase):
     """
 
     def test_validate_invalid_slug(self):
-        """Проверка invalid slug
+        """Тестирование invalid slug
         """
         with self.assertRaises(ValidationError):
             # Создаем объект
@@ -25,7 +27,7 @@ class SlugValidatorTest(TestCase):
             miner.save()
 
     def test_validate_valid_slug(self):
-        """Проверка valid slug
+        """Тестирование valid slug
         """
         # Создаем объект
         miner = Miner(
@@ -43,7 +45,7 @@ class JsonValidatorTest(TestCase):
     """
 
     def test_validate_invalid_json(self):
-        """Проверка invalid json
+        """Тестирование invalid json
         """
         # Создаем майнер
         miner = Miner.objects.create(
@@ -63,7 +65,7 @@ class JsonValidatorTest(TestCase):
             request.save()
 
     def test_validate_valid_json(self):
-        """Проверка valid json
+        """Тестирование valid json
         """
         # Создаем майнер
         miner = Miner.objects.create(
@@ -152,7 +154,7 @@ class GetSlugTest(TestCase):
         self.assertNotEqual(server.slug, other_server.slug)
 
     def test_get_slug(self):
-        """Генерация неуникального slug
+        """Генерация не уникального slug
         """
         # Создаем первый объект
         miner = Miner(name='Miner', version='1.0.b')
@@ -177,7 +179,7 @@ class GetSlugTest(TestCase):
         self.assertEqual(miner.slug, other_miner.slug)
 
     def test_get_slug_conflict(self):
-        """Генерация неуникального slug недопустимого значения
+        """Генерация не уникального slug недопустимого значения
         """
         miner = Miner(name='Miner', version='1.0.b')
         miner.save()
@@ -275,3 +277,50 @@ class GetSlugTest(TestCase):
 
         # Поля slug должны совпадать
         self.assertEqual(third_request.slug, first_request.slug)
+
+
+class PreSaveGetSlugTest(TestCase):
+    """Тестирование генерации slug при сохранении
+    """
+
+    def slug_already_exists(self):
+        """Тестирование slug уже задан
+        """
+        # Создаем объект
+        miner = Miner(
+            name='Miner',
+            version='1.0.b',
+            slug='slug_already_exists',
+        )
+        miner.save()
+
+        # Slug не должен поменяться
+        self.assertEqual('slug_already_exists')
+
+    def test_known_model(self):
+        """Тестирование slug не задан
+        """
+        # Создаем объект
+        miner = Miner(name='Miner', version='1.0.b')
+        miner.save()
+
+        # Поле slug не пустое
+        self.assertNotEqual(miner.slug, '')
+
+    def test_unknown_model(self):
+        """Тестирование параметры slug для модели не заданы
+        """
+        miner = Miner.objects.create(
+            name='Miner',
+            version='1.0.b',
+        )
+        server = Server.objects.create(
+            name='Create',
+            host='192.168.1.1',
+            port=80,
+            miner=miner,
+        )
+
+        # Создаем объект, параметры slug для которого не заданы
+        task = Task(server=server)
+        task.save()
