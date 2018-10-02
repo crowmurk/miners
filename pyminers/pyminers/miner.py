@@ -166,7 +166,7 @@ class Miner():
             {
                 "error_type": type(error).__name__,
                 "error_data": str(value),
-                "error_message:": str(error),
+                "error_message": str(error),
             },
         )
 
