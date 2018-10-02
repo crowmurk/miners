@@ -95,7 +95,7 @@ class Config(models.Model):
         ordering = ['-enabled', 'name', ]
 
     def __str__(self):
-        return "{name}-{active}: {description}".format(
+        return "{name} ({active}): {description}".format(
             name=self.name,
             active="Активна" if self.enabled else "Выключена",
             description=self.description,
@@ -170,9 +170,12 @@ class Server(models.Model):
         ordering = ['-enabled', 'server', ]
 
     def __str__(self):
-        return "{pk}: {server}".format(
+        return "{pk}: {server} ({requests})".format(
             pk=self.pk,
             server=self.server,
+            requests=', '.join(
+                [request.name for request in self.requests.all()],
+            ),
         )
 
     def get_absolute_url(self):

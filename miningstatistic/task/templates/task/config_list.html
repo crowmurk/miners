@@ -14,13 +14,13 @@
         <ul>
             {% for config in object_list %}
                 <li>
-                    <a href="{{ config.get_absolute_url }}">{{ config.name|title }}</a>
+                    <a href="{{ config.get_absolute_url }}">{{ config.name }}</a>
                         {% if config.enabled %}
-                            - <strong>Активна</strong>
+                            (<strong>Активна</strong>):
                         {% else %}
-                            - Выключена
+                            (Выключена):
                         {% endif %}
-                            ({{ config.description }})
+                            {{ config.description }}
                     <ul class=inline>
                         <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>

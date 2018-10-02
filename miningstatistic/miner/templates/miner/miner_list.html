@@ -14,8 +14,7 @@
         <ul>
             {% for miner in object_list %}
                 <li>
-                    <a href="{{ miner.get_absolute_url }}">{{ miner.name|title }}</a>
-                    ({{ miner.version }})
+                    <a href="{{ miner.get_absolute_url }}">{{ miner }}</a>
                     <ul class=inline>
                         <li><a href="{{ miner.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ miner.get_delete_url }}" class="button">Удалить</a></li>

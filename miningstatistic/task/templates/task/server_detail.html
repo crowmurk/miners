@@ -1,14 +1,14 @@
 {% extends "task/base_task.html" %}
 
 {% block title %}
-    {{ block.super }} - Задание: #{{ server.id }}
+    {{ block.super }} - {{ server }}
 {% endblock %}
 
 {% block content %}
     <article>
         <div class="row">
             <div class="offset-by-two eight columns">
-                <h3>Задание: #{{ server.id }}</h3>
+                <h3>Задание #{{ server.id }}</h3>
                 <ul class="inline">
                     <li><a href="{{ server.get_update_url }}" class="button">Изменить задание</a></li>
                     <li><a href="{{ server.get_delete_url }}" class="button">Удалить задание</a></li>
@@ -40,7 +40,7 @@
                 <h5>Параметры задания:</h5>
                 <dl>
                     <dt><strong>Сервер:</strong></dt>
-                    <dd><a href="{{ server.server.get_absolute_url }}">{{ server.server }}</a></dd>
+                    <dd><a href="{{ server.server.get_absolute_url }}">{{ server.server.name }}</a></dd>
                     <dt><strong>Майнер:</strong></dt>
                     <dd><a href="{{ server.server.miner.get_absolute_url }}">{{ server.server.miner }}</a></dd>
                     <dt><strong>Запросы:</strong></dt>

@@ -14,26 +14,21 @@
         <ul>
             {% for server in object_list %}
                 <li>
-                    <a href="{{ server.get_absolute_url }}">#{{ server }}</a>
-                        (
-                        {% for request in server.requests.all %}
-                            {{ request.name }},
-                        {% endfor %}
-                        )
-                        {% if server.enabled %}
-                            - <strong>Активно</strong>
-                        {% else %}
-                            - Выключено
-                        {% endif %}
-                        {% if server.last_executed %}
-                            - {{ server.last_executed }}
-                        {% endif %}
-                        {% if server.status %}
-                            - Успех
-                        {% endif %}
-                        {% if server.status is False %}
-                            - Ошибка
-                        {% endif %}
+                    <a href="{{ server.get_absolute_url }}">Задание #{{ server }}</a>:
+                    {% if server.enabled %}
+                        - <strong>Активно</strong>
+                    {% else %}
+                        - Выключено
+                    {% endif %}
+                    {% if server.last_executed %}
+                        - {{ server.last_executed }}
+                    {% endif %}
+                    {% if server.status %}
+                        - Успех
+                    {% endif %}
+                    {% if server.status is False %}
+                        - Ошибка
+                    {% endif %}
                     <ul class=inline>
                         <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>

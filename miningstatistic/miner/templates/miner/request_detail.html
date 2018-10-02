@@ -2,7 +2,7 @@
 {% load prettyfy %}
 
 {% block title %}
-    {{ block.super }} - {{ request.name }}
+    {{ block.super }} - {{ request }}
 {% endblock %}
 
 {% block miner_content %}
@@ -16,7 +16,7 @@
                 </ul>
                 <dl>
                     <dt><strong>Майнер:</strong></dt>
-                    <dd><a href="{{ request.miner.get_absolute_url }}"> {{ request.miner.name }} - {{ request.miner.version }}</a></dd>
+                    <dd><a href="{{ request.miner.get_absolute_url }}">{{ request.miner }}</a></dd>
                     {% if request.description %}
                         <dt><strong>Описание:</strong></dt>
                         <dd>{{ request.description|linebreaks }}</dd>

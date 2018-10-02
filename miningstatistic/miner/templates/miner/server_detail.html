@@ -1,7 +1,7 @@
 {% extends "miner/base_miner.html" %}
 
 {% block title %}
-    {{ block.super }} - {{ server.name }}
+    {{ block.super }} - {{ server }}
 {% endblock %}
 
 {% block miner_content %}
@@ -24,7 +24,7 @@
                     {% endif %}
                     {% if server.miner %}
                         <dt><strong>Установлен майнер:</strong></dt>
-                        <dd><a href="{{ server.miner.get_absolute_url }}"> {{ server.miner.name }} - {{ server.miner.version }}</a></dd>
+                        <dd><a href="{{ server.miner.get_absolute_url }}">{{ server.miner }}</a></dd>
                     {% endif %}
                 </dl>
             </div>

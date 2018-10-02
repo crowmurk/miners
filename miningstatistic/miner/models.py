@@ -101,9 +101,8 @@ class Request(models.Model):
         unique_together = (('miner', 'slug'),)
 
     def __str__(self):
-        return "{miner} {version} - {name}".format(
-            miner=self.miner.name,
-            version=self.miner.version,
+        return "{miner} - {name}".format(
+            miner=self.miner,
             name=self.name,
         )
 
@@ -176,12 +175,11 @@ class Server(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return "{name} - {host}:{port} ({miner} {version})".format(
+        return "{name} - {host}:{port} ({miner})".format(
             name=self.name,
             host=self.host,
             port=self.port,
-            miner=self.miner.name,
-            version=self.miner.version,
+            miner=self.miner,
         )
 
     def get_absolute_url(self):
