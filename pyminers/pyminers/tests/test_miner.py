@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import unittest
 import json
 
@@ -233,7 +230,3 @@ class MinerSendRequestTest(unittest.TestCase):
 
     def test_respomse_invalid(self):
         pass
-
-
-if __name__ == '__main__':
-    unittest.main()
