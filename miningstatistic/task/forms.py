@@ -25,7 +25,7 @@ class ConfigForm(forms.ModelForm):
                 )
 
         # Если отправляется статистика на Zabbix сервер,
-        # должен быть указан его адрес и порт
+        # должен быть указан его адрес и порт и таймаут
         if cleaned_data['zabbix_send']:
             if not cleaned_data['zabbix_server']:
                 self.add_error(
@@ -41,6 +41,15 @@ class ConfigForm(forms.ModelForm):
                     'zabbix_port',
                     forms.ValidationError(
                         _("Не задан порт Zabbix сервера."),
+                        code='required',
+                    ),
+                )
+
+            if not cleaned_data['zabbix_timeout']:
+                self.add_error(
+                    'zabbix_timeout',
+                    forms.ValidationError(
+                        _("Не задан таймаут Zabbix сервера."),
                         code='required',
                     ),
                 )

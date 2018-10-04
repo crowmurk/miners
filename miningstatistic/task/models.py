@@ -66,6 +66,14 @@ class Config(models.Model):
             MaxValueValidator(65535),
         ],
     )
+    zabbix_timeout = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(60),
+        ],
+    )
     zabbix_send = models.BooleanField(
         default=False,
         help_text='Отправлять статистику Zabbix серверу.',

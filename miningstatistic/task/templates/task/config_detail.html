@@ -47,6 +47,10 @@
                         <dt><strong>Порт:</strong></dt>
                         <dd>{{ config.zabbix_port }}</dd>
                     {% endif %}
+                    {% if config.zabbix_timeout %}
+                        <dt><strong>Таймаут:</strong></dt>
+                        <dd>{{ config.zabbix_timeout }}</dd>
+                    {% endif %}
                     <dt><strong>Отправлять статистику:</strong></dt>
                     {% if config.zabbix_send %}
                         <dd>Да</dd>
