@@ -2,6 +2,8 @@
 
 """Модуль содержит реализацию класса Sender"""
 
+import datetime
+
 from copy import deepcopy
 import queue as Queue
 import threading
@@ -175,6 +177,7 @@ class Sender():
                 exchange = {
                     'Request': miner.request,
                     'Response': miner.response,
+                    'When': datetime.datetime.now(),
                     'Error': miner.error,
                 }
                 if name not in self.__results:
