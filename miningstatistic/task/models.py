@@ -162,6 +162,13 @@ class Server(models.Model):
         Request,
         related_name='tasks',
     )
+    timeout = models.PositiveSmallIntegerField(
+        default=5,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(60),
+        ],
+    )
     enabled = models.BooleanField(
         default=False,
     )

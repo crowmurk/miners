@@ -49,6 +49,10 @@
                     {% empty %}
                         <li><em>Запросы отсутствуют.</em></li>
                     {% endfor %}
+                    {% if server.timeout %}
+                        <dt><strong>Таймаут:</strong></dt>
+                        <dd>{{ server.timeout }}</dd>
+                    {% endif %}
                 </dl>
             </div>
         </div>
