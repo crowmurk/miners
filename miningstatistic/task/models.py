@@ -9,7 +9,7 @@ from django.core.validators import (
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-import miner.models
+from miner.models import Server, Request
 
 from core.validators import validate_slug, validate_json
 
@@ -152,14 +152,14 @@ class Config(models.Model):
                 )
 
 
-class Server(models.Model):
+class ServerTask(models.Model):
     server = models.ForeignKey(
-        miner.models.Server,
+        Server,
         on_delete=models.CASCADE,
         related_name='tasks'
     )
     requests = models.ManyToManyField(
-        miner.models.Request,
+        Request,
         related_name='tasks',
     )
     timeout = models.PositiveSmallIntegerField(
@@ -195,26 +195,26 @@ class Server(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'task:server:detail',
+            'task:servertask:detail',
             kwargs={'pk': self.pk},
         )
 
     def get_update_url(self):
         return reverse(
-            'task:server:update',
+            'task:servertask:update',
             kwargs={'pk': self.pk},
         )
 
     def get_delete_url(self):
         return reverse(
-            'task:server:delete',
+            'task:servertask:delete',
             kwargs={'pk': self.pk},
         )
 
 
 class ServerStatistic(models.Model):
     server = models.ForeignKey(
-        Server,
+        ServerTask,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -246,18 +246,18 @@ class ServerStatistic(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'task:server:statistic:detail',
+            'task:servertask:statistic:detail',
             kwargs={'pk': self.pk},
         )
 
     def get_update_url(self):
         return reverse(
-            'task:server:statistic:update',
+            'task:servertask:statistic:update',
             kwargs={'pk': self.pk},
         )
 
     def get_delete_url(self):
         return reverse(
-            'task:server:statistic:delete',
+            'task:servertask:statistic:delete',
             kwargs={'pk': self.pk},
         )

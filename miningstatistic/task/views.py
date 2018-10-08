@@ -7,8 +7,8 @@ from django.views.generic import (
     DeleteView
 )
 
-from .models import Config, Server
-from .forms import ConfigForm, ServerForm
+from .models import Config, ServerTask
+from .forms import ConfigForm, ServerTaskForm
 
 # Create your views here.
 
@@ -37,26 +37,26 @@ class ConfigDelete(DeleteView):
     success_url = reverse_lazy('task:config:list')
 
 
-class ServerList(ListView):
-    model = Server
+class ServerTaskList(ListView):
+    model = ServerTask
     paginate_by = 7
 
 
-class ServerCreate(CreateView):
-    model = Server
-    form_class = ServerForm
+class ServerTaskCreate(CreateView):
+    model = ServerTask
+    form_class = ServerTaskForm
 
 
-class ServerDetail(DetailView):
-    model = Server
-    form_class = ServerForm
+class ServerTaskDetail(DetailView):
+    model = ServerTask
+    form_class = ServerTaskForm
 
 
-class ServerUpdate(UpdateView):
-    model = Server
-    form_class = ServerForm
+class ServerTaskUpdate(UpdateView):
+    model = ServerTask
+    form_class = ServerTaskForm
 
 
-class ServerDelete(DeleteView):
-    model = Server
-    success_url = reverse_lazy('task:server:list')
+class ServerTaskDelete(DeleteView):
+    model = ServerTask
+    success_url = reverse_lazy('task:servertask:list')

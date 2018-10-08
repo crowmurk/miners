@@ -3,7 +3,7 @@
 
 {% block title %}
     {{ block.super }}
-    {% if server %}
+    {% if servertask %}
         - Изменить задание
     {% else %}
         - Создать задание
@@ -11,10 +11,10 @@
 {% endblock %}
 
 {% block content %}
-    {% if server %}
-        {% form server.get_update_url 'Изменить задание' %}
+    {% if servertask %}
+        {% form servertask.get_update_url 'Изменить задание' %}
     {% else %}
-        {% url 'task:server:create' as form_url %}
+        {% url 'task:servertask:create' as form_url %}
         {% form form_url 'Создать задание' %}
     {% endif %}
 {% endblock %}

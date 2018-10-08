@@ -13,15 +13,15 @@ config = [
     path('<slug:slug>/delete/', views.ConfigDelete.as_view(), name='delete'),
 ]
 
-task = [
-    path('', views.ServerList.as_view(), name='list'),
-    path('create/', views.ServerCreate.as_view(), name='create'),
-    path('<int:pk>/', views.ServerDetail.as_view(), name='detail'),
-    path('<int:pk>/update/', views.ServerUpdate.as_view(), name='update'),
-    path('<int:pk>/delete/', views.ServerDelete.as_view(), name='delete'),
+server = [
+    path('', views.ServerTaskList.as_view(), name='list'),
+    path('create/', views.ServerTaskCreate.as_view(), name='create'),
+    path('<int:pk>/', views.ServerTaskDetail.as_view(), name='detail'),
+    path('<int:pk>/update/', views.ServerTaskUpdate.as_view(), name='update'),
+    path('<int:pk>/delete/', views.ServerTaskDelete.as_view(), name='delete'),
 ]
 
 urlpatterns = [
     path('config/', include((config, 'config'))),
-    path('task/', include((task, 'server'))),
+    path('task/', include((server, 'servertask'))),
 ]
