@@ -9,9 +9,9 @@ from django.core.validators import (
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from core.validators import validate_slug
+import miner.models
 
-from miner.models import Server, Request
+from core.validators import validate_slug, validate_json
 
 # Create your models here.
 
@@ -154,12 +154,12 @@ class Config(models.Model):
 
 class Server(models.Model):
     server = models.ForeignKey(
-        Server,
+        miner.models.Server,
         on_delete=models.CASCADE,
         related_name='tasks'
     )
     requests = models.ManyToManyField(
-        Request,
+        miner.models.Request,
         related_name='tasks',
     )
     timeout = models.PositiveSmallIntegerField(
@@ -208,5 +208,56 @@ class Server(models.Model):
     def get_delete_url(self):
         return reverse(
             'task:server:delete',
+            kwargs={'pk': self.pk},
+        )
+
+
+class ServerStatistic(models.Model):
+    server = models.ForeignKey(
+        Server,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='statistic',
+    )
+    result = models.TextField(
+        validators=[
+            validate_json,
+        ],
+        help_text='Результат выполнения опроса',
+    )
+    executed = models.DateTimeField(
+        help_text='Время выполнения опроса',
+    )
+    status = models.BooleanField(
+        help_text='Статус опроса',
+    )
+
+    class Meta:
+        verbose_name = 'Статистика работы серверов'
+        ordering = ['executed', 'server', '-status']
+
+    def __str__(self):
+        return "{server}: {executed} - {status}".format(
+            server=self.server,
+            executed=self.executed,
+            status=self.status,
+        )
+
+    def get_absolute_url(self):
+        return reverse(
+            'task:server:statistic:detail',
+            kwargs={'pk': self.pk},
+        )
+
+    def get_update_url(self):
+        return reverse(
+            'task:server:statistic:update',
+            kwargs={'pk': self.pk},
+        )
+
+    def get_delete_url(self):
+        return reverse(
+            'task:server:statistic:delete',
             kwargs={'pk': self.pk},
         )
