@@ -10,15 +10,53 @@ import sys
 import os
 import django
 
+from collections import namedtuple
+
 from pyminers import Sender
+
 
 class Worker():
     def __init__(self, config='Default'):
-        # TODO Raise error если выключен
-        self.config = models.Config.objects.get(name=config)
-        self.tasks = models.Server.objects.filter(enabled=True)
+        # Получаем общие настройки, как словарь
+        self.__config = Config.objects.filter(
+            name=config,
+            enabled=True,
+        ).values().first()
+        if not self.__config:
+            # Конфигурация должна существовать
+            # и быть включена
+            raise ValueError(
+                "Конфигурация с именем \"{config}\""
+                " не существует или выключена".format(
+                    config=config,
+                )
+            )
 
-    def get_tasks_for_sender(self):
+        # Получаем настроки опроса майнеров
+        self.__tasks = Server.objects.filter(enabled=True)
+        if not self.tasks:
+            raise ValueError(
+                "Задания отсутсвуют, проверьте"
+                " настройки опроса майнеров"
+            )
+
+    @property
+    def config(self):
+        """Настроки работы скрипта
+        """
+        try:
+            properties = namedtuple(
+                'config',
+                [item.lower() for item in self.__config.keys()],
+            )
+            return properties(*self.__config.values())
+        except AttributeError:
+            return None
+
+    @property
+    def tasks(self):
+        """Параметры опроса майнеров
+        """
         tasks = {}
 
         # TODO Sender для проверки исползует
@@ -32,13 +70,12 @@ class Worker():
         }
 
         # Формируем список заданий для Sender
-        for task in self.tasks:
+        for task in self.__tasks:
             tasks[task.id] = {
                 'Host': task.server.host,
                 'Port': task.server.port,
                 'Miner': miner_name_map[task.server.miner.name],
-                # TODO Добавить поле в БД с настройкой
-                'Timeout': 5,
+                'Timeout': task.timeout,
                 'Request': [request.name for request in task.requests.all()]
             }
         return tasks
@@ -48,7 +85,8 @@ def main():
     works = Worker(config='Develop')
 
     # Опрашиваем майнеры
-    sender = Sender(works.get_tasks_for_sender())
+    sender = Sender(works.tasks)
+
     sender.sendRequests()
     # TODO Добавить время выполнения запроса
     # в результатах Sender
@@ -83,6 +121,6 @@ if __name__ == '__main__':
     django.setup()
 
     # Здесь импортируем модули проекта
-    import task.models as models
+    from task.models import Config, Server
 
     sys.exit(main())
