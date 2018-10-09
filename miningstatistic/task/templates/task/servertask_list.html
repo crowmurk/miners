@@ -14,7 +14,13 @@
         <ul>
             {% for servertask in object_list %}
                 <li>
-                    <a href="{{ servertask.get_absolute_url }}">Задание #{{ servertask }}</a>:
+                    <a href="{{ servertask.get_absolute_url }}">Задание #{{ servertask.pk }}</a>
+                    : {{ servertask.server }}
+                    (
+                    {% for request in servertask.requests.all %}
+                        {{ request.name }},
+                    {% endfor %}
+                    )
                     {% if servertask.enabled %}
                         - <strong>Активно</strong>
                     {% else %}

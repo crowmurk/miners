@@ -185,12 +185,13 @@ class ServerTask(models.Model):
         ordering = ['-enabled', 'server', ]
 
     def __str__(self):
-        return "{pk}: {server} ({requests})".format(
+        return "{pk}: {server} ({requests}) - {enabled}".format(
             pk=self.pk,
             server=self.server,
             requests=', '.join(
                 [request.name for request in self.requests.all()],
             ),
+            enabled='Активно' if self.enabled else 'Выключено',
         )
 
     def get_absolute_url(self):
@@ -238,10 +239,10 @@ class ServerStatistic(models.Model):
         ordering = ['executed', 'server', '-status']
 
     def __str__(self):
-        return "{server}: {executed} - {status}".format(
+        return "{server} - {executed} - {status}".format(
             server=self.server,
             executed=self.executed,
-            status=self.status,
+            status='Успех' if self.status else 'Ошибка',
         )
 
     def get_absolute_url(self):
