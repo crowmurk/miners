@@ -150,14 +150,28 @@ class MinerSetUpTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.miner.timeout = 0
 
-    def test_request_valid(self):
-        """Допустимый формат запроса
+    def test_request_valid_str(self):
+        """Допустимый формат запроса в виде строки
         """
         self.miner.error = True
         self.miner.request = '{"key": "value"}'
         self.assertDictEqual(
             self.miner.request,
-            json.loads('{"key": "value"}'))
+            json.loads('{"key": "value"}'),
+        )
+
+        # Флаг ошибки должен быть сброшен
+        self.assertEqual(self.miner.error, False)
+
+    def test_request_valid_dict(self):
+        """Допустимый формат запроса в виде словаря
+        """
+        self.miner.error = True
+        self.miner.request = {"key": "value"}
+        self.assertDictEqual(
+            self.miner.request,
+            {"key": "value"},
+        )
 
         # Флаг ошибки должен быть сброшен
         self.assertEqual(self.miner.error, False)
@@ -185,14 +199,28 @@ class MinerSetUpTest(unittest.TestCase):
         self.assertDictEqual(self.miner.response, invalid_response)
         self.assertEqual(self.miner.error, True)
 
-    def test_response_valid(self):
-        """Допустимый формат ответа
+    def test_response_valid_str(self):
+        """Допустимый формат ответа в виде строки
         """
         self.miner.error = True
         self.miner.response = '{"key": "value"}'
         self.assertDictEqual(
             self.miner.response,
-            json.loads('{"key": "value"}'))
+            json.loads('{"key": "value"}'),
+        )
+
+        # Флаг ошибки должен быть сброшен
+        self.assertEqual(self.miner.error, False)
+
+    def test_response_valid_dict(self):
+        """Допустимый формат ответа в виде словаря
+        """
+        self.miner.error = True
+        self.miner.response = {"key": "value"}
+        self.assertDictEqual(
+            self.miner.response,
+            {"key": "value"},
+        )
 
         # Флаг ошибки должен быть сброшен
         self.assertEqual(self.miner.error, False)
