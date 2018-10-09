@@ -126,10 +126,18 @@ class Miner():
 
     @request.setter
     def request(self, value):
-        """Запрос к майнеру, должен быть в формате json"""
+        """Запрос к майнеру, должен быть
+        строкой в формате json
+        """
         try:
-            json.loads(value)
-            self.__request = value
+            if isinstance(value, (str, bytes, bytearray)):
+                json.loads(value)
+                self.__request = value
+            else:
+                self.__request = bytes(
+                    json.dumps(value),
+                    encoding='utf-8',
+                )
             self.__error = False
         except ValueError as e:
             raise ValueError(
@@ -148,10 +156,18 @@ class Miner():
 
     @response.setter
     def response(self, value):
-        """Ответ от майнера, должен быть в формате json"""
+        """Ответ от майнера, должен быть
+        строкой в формате json
+        """
         try:
-            json.loads(value)
-            self.__response = value
+            if isinstance(value, (str, bytes, bytearray)):
+                json.loads(value)
+                self.__response = value
+            else:
+                self.__response = bytes(
+                    json.dumps(value),
+                    encoding='utf-8',
+                )
             self.__error = False
         except ValueError as e:
             self.errorResponse(e, value)
