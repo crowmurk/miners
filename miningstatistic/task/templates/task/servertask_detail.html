@@ -21,8 +21,8 @@
                         <dd>Нет</dd>
                     {% endif %}
                     <qdt><strong>Последний запуск:</strong></dt>
-                    {% if servertask.last_executed %}
-                        <dd>{{ servertask.last_executed }}</dd>
+                    {% if servertask.executed %}
+                        <dd>{{ servertask.executed }}</dd>
                     {% else %}
                         <dd>Никогда</dd>
                     {% endif %}

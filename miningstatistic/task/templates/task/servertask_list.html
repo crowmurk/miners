@@ -26,14 +26,14 @@
                     {% else %}
                         - Выключено
                     {% endif %}
-                    {% if servertask.last_executed %}
-                        - {{ servertask.last_executed }}
+                    {% if servertask.executed %}
+                        - {{ servertask.executed }}
                     {% endif %}
                     {% if servertask.status %}
                         - Успех
                     {% endif %}
                     {% if servertask.status is False %}
-                        - Ошибка
+                        - <strong>Ошибка</strong>
                     {% endif %}
                     <ul class=inline>
                         <li><a href="{{ servertask.get_update_url }}" class="button">Изменить</a></li>
