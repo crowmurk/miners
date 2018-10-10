@@ -172,8 +172,9 @@ class ServerTask(models.Model):
     enabled = models.BooleanField(
         default=False,
     )
-    last_executed = models.DateTimeField(
+    executed = models.DateTimeField(
         null=True,
+        help_text='Время последнего запуска',
     )
     status = models.BooleanField(
         null=True,
@@ -214,33 +215,37 @@ class ServerTask(models.Model):
 
 
 class ServerStatistic(models.Model):
-    server = models.ForeignKey(
+    task = models.ForeignKey(
         ServerTask,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
         related_name='statistic',
+    )
+    request_id = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+        ],
+        help_text='Идентификатор опроса',
     )
     result = models.TextField(
         validators=[
             validate_json,
         ],
-        help_text='Результат выполнения опроса',
+        help_text='Результат выполнения задания',
     )
     executed = models.DateTimeField(
-        help_text='Время выполнения опроса',
+        help_text='Время выполнения задания',
     )
     status = models.BooleanField(
-        help_text='Статус опроса',
+        help_text='Статус выполнения задания',
     )
 
     class Meta:
         verbose_name = 'Статистика работы серверов'
-        ordering = ['executed', 'server', '-status']
+        ordering = ['-request_id', 'task', '-status']
 
     def __str__(self):
-        return "{server} - {executed} - {status}".format(
-            server=self.server,
+        return "{task} - {executed} - {status}".format(
+            task=self.task,
             executed=self.executed,
             status='Успех' if self.status else 'Ошибка',
         )

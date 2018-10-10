@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('miner', '0007_miner_request_slug_unique_together'),
-        ('task', '0012_server_statistic_create_model'),
+        ('task', '0011_server_add_timeout'),
     ]
 
     operations = [
