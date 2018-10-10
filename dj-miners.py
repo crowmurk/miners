@@ -9,7 +9,6 @@
 import sys
 import os
 import django
-import datetime
 import logging
 import json
 
@@ -138,35 +137,68 @@ class Worker():
         self.__logger.addHandler(handler)
 
     def save(self, data):
-        """Добавляет записи в БД
+        """Добавляет результаты выполнения заданий в БД
         """
-        # Добавляем записи в БД
-        for server_task_id, server_task_data in data.items():
+        # Получаем идентификатор опроса
+        if ServerStatistic.objects.count():
+            # Есть записи в таблице
+            request_id = ServerStatistic.objects.aggregate(
+                Max('request_id'),
+            )['request_id__max'] + 1
+        else:
+            request_id = 1
+
+        # Добавяем результаты выполнения заданий
+        for task_id, task_data in data.items():
+            task = ServerTask.objects.get(id=task_id)
             # Готовим данные для добавения
-            server_task = ServerTask.objects.get(id=server_task_id, enabled=True)
-            cleaned_data = {
-                'server': server_task.id,
+            data = {
+                # Идентификатор задания
+                'task': task.id,
+                # Идентификатор опроса
+                'request_id': request_id,
+                # True, если все запросы успешны
                 'status': all(
-                    [not line['Error'] for line in server_task_data['Exchange']],
+                    [not line['Error']
+                     for line in task_data['Exchange']],
                 ),
-                'executed': datetime.datetime.now(),
-                'result': json.dumps(
-                    [{'request': line['Request'], 'response': line['Response']}
-                     for line in server_task_data['Exchange']],
+                # Время выполнения последнего запроса
+                'executed': max(
+                    [line['When']
+                     for line in task_data['Exchange']],
                 ),
+                # Результаты запросов
+                'result': dict(),
             }
 
+            # Добавляем результаты для сохранения
+            for line in task_data['Exchange']:
+                for request in task.requests.values('name', 'request'):
+                    if line['Request'] == json.loads(request['request']):
+                        data['result'][request['name']] = line['Response']
+                        break
+            data['result'] = json.dumps(data['result'])
+
             # Форма обеспечивает проверку данных
-            form = ServerStatisticForm(cleaned_data)
+            form = ServerStatisticForm(data)
 
             if form.is_valid():
+                # Сохраняем результаты в БД
                 form.save()
+
+                # Обновляем статус задания
+                task.executed = form.instance.executed
+                task.status = form.instance.status
+                task.save()
+
+                # Запись в лог
                 self.log.info(
                     "Сохранение в БД:  {data}".format(
                         data=form.instance,
                     ),
                 )
             else:
+                # Запись в лог
                 self.log.error(
                     "Ошибка записи  в БД: {data}"
                     " Причина: {error}".format(
@@ -214,7 +246,8 @@ if __name__ == '__main__':
     django.setup()
 
     # Здесь импортируем модули проекта
-    from task.models import Config, ServerTask
+    from task.models import Config, ServerTask, ServerStatistic
     from task.forms import ServerStatisticForm
+    from django.db.models import Max
 
     sys.exit(main())
