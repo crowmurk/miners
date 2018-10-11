@@ -214,6 +214,17 @@ class ServerTask(models.Model):
         )
 
 
+class ServerStatisticQueryset(models.QuerySet):
+    def results_last(self):
+        if ServerStatistic.objects.count():
+            request_id_max = ServerStatistic.objects.aggregate(
+                models.Max('request_id'),
+            )['request_id__max']
+        else:
+            request_id_max = 0
+        return self.filter(request_id=request_id_max)
+
+
 class ServerStatistic(models.Model):
     task = models.ForeignKey(
         ServerTask,
@@ -238,6 +249,8 @@ class ServerStatistic(models.Model):
     status = models.BooleanField(
         help_text='Статус выполнения задания',
     )
+
+    objects = ServerStatisticQueryset.as_manager()
 
     class Meta:
         verbose_name = 'Статистика работы серверов'

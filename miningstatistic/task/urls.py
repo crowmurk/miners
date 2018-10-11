@@ -22,7 +22,7 @@ servertask = [
 ]
 
 statistic = [
-    path('', views.server_statistic, name='server'),
+    path('', views.ServerStatisticList.as_view(), name='server'),
 ]
 
 urlpatterns = [
