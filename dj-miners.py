@@ -6,6 +6,7 @@
 # Загрузка результатов в БД - OK
 # TODO Отправка статистики Zabbix
 
+import datetime
 import django
 import json
 import logging
@@ -15,7 +16,6 @@ import sys
 
 from collections import namedtuple
 from copy import deepcopy
-from datetime import datetime
 from systemd import journal
 
 from pyminers import Sender
@@ -271,13 +271,11 @@ class Converter():
         except KeyError as e:
             raise ValueError("Invalid response:", e) from None
 
-        # Elapsed time
-        m, _ = divmod(summary['Elapsed'], 60)
-        h, m = divmod(m, 60)
-        d, h = divmod(h, 24)
-        summary['Elapsed'] = '{}d {:02}:{:02}'.format(d, h, m)
+        # Uptime
+        summary['Elapsed'] = str(datetime.timedelta(seconds=summary['Elapsed']))
 
-        summary['Last getwork'] = datetime.fromtimestamp(
+        # Last getwork
+        summary['Last getwork'] = datetime.datetime.fromtimestamp(
             summary['Last getwork'],
         ).strftime("%Y.%m.%d-%H:%M:%S")
 
@@ -301,6 +299,7 @@ class Converter():
              for key, template in templates.items()},
         )
 
+        # Description
         summary['Description'] = '{miner} - {version}'.format(
             miner=stats['Type'],
             version=stats['Miner'],
@@ -364,9 +363,7 @@ class Converter():
             raise ValueError("Invalid response:", e) from None
 
         # Uptime
-        h, m = divmod(value['Uptime'], 60)
-        d, h = divmod(h, 24)
-        value['Uptime'] = '{}d {:02}:{:02}'.format(d, h, m)
+        value['Uptime'] = str(datetime.timedelta(minutes=value['Uptime']))
 
         # Статистика ETH / DCR
         for key in ['ETH', 'DCR']:
