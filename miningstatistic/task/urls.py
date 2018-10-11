@@ -13,7 +13,7 @@ config = [
     path('<slug:slug>/delete/', views.ConfigDelete.as_view(), name='delete'),
 ]
 
-server = [
+servertask = [
     path('', views.ServerTaskList.as_view(), name='list'),
     path('create/', views.ServerTaskCreate.as_view(), name='create'),
     path('<int:pk>/', views.ServerTaskDetail.as_view(), name='detail'),
@@ -21,7 +21,12 @@ server = [
     path('<int:pk>/delete/', views.ServerTaskDelete.as_view(), name='delete'),
 ]
 
+statistic = [
+    path('', views.server_statistic, name='server'),
+]
+
 urlpatterns = [
     path('config/', include((config, 'config'))),
-    path('task/', include((server, 'servertask'))),
+    path('task/', include((servertask, 'servertask'))),
+    path('statistic/', include((statistic, 'statistic')))
 ]

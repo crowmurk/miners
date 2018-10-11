@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.db.models import Max
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView,
@@ -7,7 +9,7 @@ from django.views.generic import (
     DeleteView
 )
 
-from .models import Config, ServerTask
+from .models import Config, ServerTask, ServerStatistic
 from .forms import ConfigForm, ServerTaskForm
 
 # Create your views here.
@@ -60,3 +62,20 @@ class ServerTaskUpdate(UpdateView):
 class ServerTaskDelete(DeleteView):
     model = ServerTask
     success_url = reverse_lazy('task:servertask:list')
+
+
+def server_statistic(request):
+    if ServerStatistic.objects.count():
+        # Есть записи в таблице
+        request_id_max = ServerStatistic.objects.aggregate(
+            Max('request_id'),
+        )['request_id__max']
+    else:
+        request_id_max = 0
+    return render(
+        request,
+        'task/serverstatistic_table.html',
+        {'serverstatistic': ServerStatistic.objects.filter(
+            request_id=request_id_max),
+         },
+    )
