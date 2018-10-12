@@ -7,11 +7,8 @@ from django.views.generic import (
     DeleteView
 )
 
-from django_tables2 import SingleTableView
-
-from .models import Config, ServerTask, ServerStatistic
+from .models import Config, ServerTask
 from .forms import ConfigForm, ServerTaskForm
-from .tables import ServerStatisticTable
 
 # Create your views here.
 
@@ -62,9 +59,4 @@ class ServerTaskUpdate(UpdateView):
 
 class ServerTaskDelete(DeleteView):
     model = ServerTask
-    success_url = reverse_lazy('task:servertask:list')
-
-
-class ServerStatisticList(SingleTableView):
-    table_class = ServerStatisticTable
-    queryset = ServerStatistic.objects.results_last()
+    success_url = reverse_lazy('task:server:list')

@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from miner.models import Server, Request
 
-from core.validators import validate_slug, validate_json
+from core.validators import validate_slug
 
 # Create your models here.
 
@@ -197,86 +197,18 @@ class ServerTask(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'task:servertask:detail',
+            'task:server:detail',
             kwargs={'pk': self.pk},
         )
 
     def get_update_url(self):
         return reverse(
-            'task:servertask:update',
+            'task:server:update',
             kwargs={'pk': self.pk},
         )
 
     def get_delete_url(self):
         return reverse(
-            'task:servertask:delete',
-            kwargs={'pk': self.pk},
-        )
-
-
-class ServerStatisticQueryset(models.QuerySet):
-    def results_last(self):
-        if ServerStatistic.objects.count():
-            request_id_max = ServerStatistic.objects.aggregate(
-                models.Max('request_id'),
-            )['request_id__max']
-        else:
-            request_id_max = 0
-        return self.filter(request_id=request_id_max)
-
-
-class ServerStatistic(models.Model):
-    task = models.ForeignKey(
-        ServerTask,
-        on_delete=models.CASCADE,
-        related_name='statistic',
-    )
-    request_id = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-        ],
-        help_text='Идентификатор опроса',
-    )
-    result = models.TextField(
-        validators=[
-            validate_json,
-        ],
-        help_text='Результат выполнения задания',
-    )
-    executed = models.DateTimeField(
-        help_text='Время выполнения задания',
-    )
-    status = models.BooleanField(
-        help_text='Статус выполнения задания',
-    )
-
-    objects = ServerStatisticQueryset.as_manager()
-
-    class Meta:
-        verbose_name = 'Статистика работы серверов'
-        ordering = ['-request_id', 'task', '-status']
-
-    def __str__(self):
-        return "{task} - {executed} - {status}".format(
-            task=self.task,
-            executed=self.executed,
-            status='Успех' if self.status else 'Ошибка',
-        )
-
-    def get_absolute_url(self):
-        return reverse(
-            'task:servertask:statistic:detail',
-            kwargs={'pk': self.pk},
-        )
-
-    def get_update_url(self):
-        return reverse(
-            'task:servertask:statistic:update',
-            kwargs={'pk': self.pk},
-        )
-
-    def get_delete_url(self):
-        return reverse(
-            'task:servertask:statistic:delete',
+            'task:server:delete',
             kwargs={'pk': self.pk},
         )

@@ -14,7 +14,7 @@
     {% if servertask %}
         {% form servertask.get_update_url 'Изменить задание' %}
     {% else %}
-        {% url 'task:servertask:create' as form_url %}
+        {% url 'task:server:create' as form_url %}
         {% form form_url 'Создать задание' %}
     {% endif %}
 {% endblock %}

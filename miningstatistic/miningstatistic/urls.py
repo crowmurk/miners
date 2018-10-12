@@ -20,10 +20,11 @@ from django.views.generic import TemplateView, RedirectView
 
 urlpatterns = [
     path('', RedirectView.as_view(
-        pattern_name='miner:server:list',
+        pattern_name='statistic:server:list',
         permanent=False)),
-    path('', include('miner.urls')),
-    path('', include('task.urls')),
+    path('', include('statistic.urls')),
+    path('miner/', include('miner.urls')),
+    path('task/', include('task.urls')),
     path('underconstruction/', TemplateView.as_view(
         template_name='site/underconstruction.html'),
         name='underconstruction'),

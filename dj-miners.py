@@ -454,8 +454,9 @@ if __name__ == '__main__':
     django.setup()
 
     # Здесь импортируем модули проекта
-    from task.models import Config, ServerTask, ServerStatistic
-    from task.forms import ServerStatisticForm
+    from task.models import Config, ServerTask
+    from statistic.models import ServerStatistic
+    from statistic.forms import ServerStatisticForm
     from django.db.models import Max
 
     sys.exit(main())

@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Config, ServerTask, ServerStatistic
+from .models import Config, ServerTask
+
 
 class ConfigForm(forms.ModelForm):
     class Meta:
@@ -61,7 +62,7 @@ class ServerTaskForm(forms.ModelForm):
     class Meta:
         model = ServerTask
         fields = '__all__'
-        exclude = ('last_executed', 'status')
+        exclude = ('executed', 'status')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -86,9 +87,3 @@ class ServerTaskForm(forms.ModelForm):
                 )
 
         return cleaned_data
-
-
-class ServerStatisticForm(forms.ModelForm):
-    class Meta:
-        model = ServerStatistic
-        fields = '__all__'

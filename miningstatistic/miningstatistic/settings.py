@@ -50,8 +50,9 @@ INSTALLED_APPS = [
     'django_tables2',
     'core.apps.CoreConfig',
     'miner.apps.MinerConfig',
-    'task.apps.TaskConfig',
     'pool.apps.PoolConfig',
+    'task.apps.TaskConfig',
+    'statistic.apps.StatisticConfig',
 ]
 
 # Develop only
