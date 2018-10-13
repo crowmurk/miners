@@ -1,6 +1,9 @@
+from django.utils import timezone
 from django.views.generic.base import TemplateView
 
 from django_tables2 import MultiTableMixin
+
+from task.models import Config
 
 from .models import ServerStatistic
 from .tables import (
@@ -39,3 +42,9 @@ class ServerStatisticList(MultiTableMixin, TemplateView):
                     task__server__miner__slug=miner_slug
                 ).table_data())
         return tables_data
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        context['update_interval'] = Config.objects.get(enabled=True).refresh
+        return context

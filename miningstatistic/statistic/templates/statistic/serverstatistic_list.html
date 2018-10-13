@@ -5,6 +5,12 @@
     {{ block.super }} - Статистика
 {% endblock %}
 
+{% block head %}
+    {{ block.super }}
+    <meta http-equiv="refresh" content="{{ update_interval }}" />
+{% endblock %}
+
+
 {% block statistic_content %}
     {% for table in tables %}
         {% if table.data %}
@@ -12,4 +18,8 @@
             {% render_table table %}
         {% endif %}
     {% endfor %}
+    <p style="font-size: 80%; text-align: right;">
+        Сейчас: {{ now }}
+        Интервал обновления: {{ update_interval }} сек.
+    </p>
 {% endblock %}
