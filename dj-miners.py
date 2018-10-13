@@ -305,14 +305,25 @@ class Converter():
             version=stats['Miner'],
         )
 
-        return {key: summary[key]
-                for key in [
-                    'Elapsed', 'Accepted', 'Rejected',
-                    'GHS av', 'Hardware Errors', 'Discarded',
-                    'Device Rejected%', 'Pool Rejected%',
-                    'Last getwork', 'Fans', 'Temps 1',
-                    'Temps 2', 'Description']
-                }
+        summary['Dev/Pool Rejected (%)'] = '{dev} / {pool}'.format(
+            dev=summary['Device Rejected%'],
+            pool=summary['Pool Rejected%'],
+        )
+
+        # Переименовываем и возвращаем только необходимые поля
+        return {val: summary[key] for key, val in {
+            'Elapsed': 'elapsed',
+            'Accepted': 'accepted',
+            'Rejected': 'rejected',
+            'GHS av': 'ghs_av',
+            'Hardware Errors': 'hardware_errors',
+            'Discarded': 'discarded',
+            'Dev/Pool Rejected (%)': 'dev_pool_rejected',
+            'Last getwork': 'last_getwork',
+            'Fans': 'fans',
+            'Temps 1': 'temps_1',
+            'Temps 2': 'temps_2',
+            'Description': 'description'}.items()}
 
     @staticmethod
     def __zCash(value):
@@ -342,16 +353,11 @@ class Converter():
         # Преобразуем списки в строки значений разделенные ';'
         value = {key: '; '.join([str(item) for item in value[key]])
                  for key in value}
-        # Переименовываем и возвращаем только необходимые поля
-        return {val: value[key]
-                for key, val in {
-                    'gpu_status': 'GPU status',
-                    'temperature': 'Temperatures',
-                    'gpu_power_usage': 'GPU power usage',
-                    'speed_sps': 'Solution / second',
-                    'accepted_shares': 'Accepted shares',
-                    'rejected_shares': 'Rejected shares'}.items()
-                }
+        # Возвращаем только необходимые поля
+        return {key: value[key] for key, val in [
+            'gpu_status', 'temperature', 'gpu_power_usage',
+            'speed_sps', 'accepted_shares', 'rejected_shares',
+        ]}
 
     @staticmethod
     def __etherium(value):
@@ -407,11 +413,16 @@ class Converter():
              for item in value['Pools']]
         )
 
-        # Возвращаем только необходимые поля
-        return {key: value[key]
-                for key in [
-                    'Uptime', 'ETH', 'ETH / GPU',
-                    'DCR', 'DCR / GPU', 'GPU', 'Pools']
+        # Переименовываем и возвращаем только необходимые поля
+        return {val: value[key]
+                for key, val in {
+                    'Uptime': 'uptime',
+                    'ETH': 'eth',
+                    'ETH / GPU': 'eth_per_gpu',
+                    'DCR': 'dcr',
+                    'DCR / GPU': 'dcr_per_gpu',
+                    'GPU': 'gpu',
+                    'Pools': 'pools'}.items()
                 }
 
 

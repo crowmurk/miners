@@ -278,7 +278,24 @@ select[multiple] {
 }
 
 /* Поле ввода текста */
+
 textarea {
     height: auto;
     width: 100%;
+}
+
+/* Переопределяем стили таблиц */
+
+table {
+    width:100%;
+}
+table, th, td {
+    border-collapse: collapse;
+}
+th, td {
+    padding: 3px;
+    text-align: center;
+}
+table tr:hover {
+    background-color: AliceBlue;
 }

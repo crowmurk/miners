@@ -5,6 +5,11 @@
     {{ block.super }} - Статистика
 {% endblock %}
 
-{% block content %}
-    {% render_table table %}
+{% block statistic_content %}
+    {% for table in tables %}
+        {% if table.data %}
+            <h5>{{ table.verbose_name }}</h5>
+            {% render_table table %}
+        {% endif %}
+    {% endfor %}
 {% endblock %}

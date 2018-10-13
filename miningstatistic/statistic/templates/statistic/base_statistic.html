@@ -1,14 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="row">
-        <section class="eight columns">
-            {% block statistic_content %}
-            {% endblock %}
-        </section>
-        <section class="four columns">
-            {% block create_button %}{% endblock %}
-        </section>
+    {% block statistic_content %}
+    {% endblock %}
     </div>
     {% if is_paginated %}
         <div class="row">

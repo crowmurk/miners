@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
@@ -16,6 +18,15 @@ class ServerStatisticQueryset(models.QuerySet):
         else:
             request_id_max = 0
         return self.filter(request_id=request_id_max)
+
+    def table_data(self):
+        table_data = []
+        results = self.values_list('task__server__slug', 'result')
+        for server, data in results:
+            data = json.loads(data)
+            data['server'] = server
+            table_data.append(data)
+        return table_data
 
 
 class ServerStatistic(models.Model):
