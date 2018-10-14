@@ -100,7 +100,7 @@ class Worker():
                     "Задан опрос неизвестного майнера '{miner}',"
                     " задание '{task}'. Обработка полей"
                     " запрос/ответ выполнена не будет.".format(
-                        miner=task_miner,
+                        miner=task.server.miner,
                         task=task.id,
                     ),
                 )
