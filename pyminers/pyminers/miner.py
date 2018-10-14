@@ -127,15 +127,25 @@ class Miner():
     @request.setter
     def request(self, value):
         """Запрос к майнеру, должен быть
-        строкой в формате json
+        строкой bytes в формате json
         """
         try:
-            if isinstance(value, (str, bytes, bytearray)):
+            if isinstance(value, bytes):
                 json.loads(value)
                 self.__request = value
-            else:
+            elif isinstance(value, bytearray):
+                json.loads(value)
+                self.__request = bytes(value)
+            elif isinstance(value, str):
+                json.loads(value)
                 self.__request = bytes(
-                    json.dumps(value),
+                    value,
+                    encoding='utf-8',
+                )
+            else:
+                value_dump = json.dumps(value)
+                self.__request = bytes(
+                    value_dump,
                     encoding='utf-8',
                 )
             self.__error = False
@@ -157,15 +167,25 @@ class Miner():
     @response.setter
     def response(self, value):
         """Ответ от майнера, должен быть
-        строкой в формате json
+        строкой bytes в формате json
         """
         try:
-            if isinstance(value, (str, bytes, bytearray)):
+            if isinstance(value, bytes):
                 json.loads(value)
                 self.__response = value
-            else:
+            elif isinstance(value, bytearray):
+                json.loads(value)
+                self.__response = bytes(value)
+            elif isinstance(value, str):
+                json.loads(value)
                 self.__response = bytes(
-                    json.dumps(value),
+                    value,
+                    encoding='utf-8',
+                )
+            else:
+                value_dump = json.dumps(value)
+                self.__response = bytes(
+                    value_dump,
                     encoding='utf-8',
                 )
             self.__error = False
