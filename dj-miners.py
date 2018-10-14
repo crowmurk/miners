@@ -76,25 +76,34 @@ class Worker():
         """
         tasks = {}
 
-        # TODO Sender для проверки исползует
-        # свои именования майнеров, надо привести
-        # к одному стандарту
+        # Соответствие между именами майнеров
+        # из pyminers и майнерами из БД django
         miner_name_map = {
-            "Antminer S9 CGMiner": "CGMiner",
-            "Claymore's CryptoNote": "Monero",
-            "Claymore's Dual Ethereum": "Etherium",
-            "EWBF's CUDA ZCash": "ZCash",
+            "antminer-s9-cgminer-490": "CGMiner",
+            "claymores-cryptonote-gpu-97": "Monero",
+            "claymores-dual-ethereum-amd-gpu-98": "Etherium",
+            "ewbfs-cuda-zcash-034b": "ZCash",
         }
 
         # Формируем список заданий для Sender
         for task in self.__server_tasks:
+            task_miner = miner_name_map.get(task.server.miner.slug, 'Miner')
             tasks[task.id] = {
                 'Host': task.server.host,
                 'Port': task.server.port,
-                'Miner': miner_name_map[task.server.miner.name],
+                'Miner': task_miner,
                 'Timeout': task.timeout,
                 'Request': [request.request for request in task.requests.all()]
             }
+            if task_miner == 'Miner':
+                self.log.warning(
+                    "Задан опрос неизвестного майнера '{miner}',"
+                    " задание '{task}'. Обработка полей"
+                    " запрос/ответ выполнена не будет.".format(
+                        miner=task_miner,
+                        task=task.id,
+                    ),
+                )
         return tasks
 
     @property
@@ -199,7 +208,10 @@ class Worker():
             # Если запрос не завершился ошибкой
             # преобразуем результаты к требуемому формату
             if data['status']:
-                data['result'] = convert(task.server.miner.name, data['result'])
+                data['result'] = convert(
+                    task.server.miner.slug,
+                    data['result'],
+                )
 
             # Форма ожидает строку а не объект
             data['result'] = json.dumps(data['result'])
@@ -218,14 +230,14 @@ class Worker():
 
                 # Запись в лог
                 self.log.info(
-                    "Сохранение в БД:  {data}".format(
+                    "Сохранение в БД:  Задание: '{data}'".format(
                         data=form.instance,
                     ),
                 )
             else:
                 # Запись в лог
                 self.log.error(
-                    "Ошибка записи  в БД: {data}"
+                    "Ошибка записи  в БД: Задание: '{data}'"
                     " Причина: {error}".format(
                         data=form.instance,
                         error=(form.errors, ),
@@ -240,10 +252,10 @@ class Converter():
     def __init__(self):
         # Методы для преобразования ответов майнеров
         self.__supported_miners = {
-            "Antminer S9 CGMiner": self.__cGMiner,
-            "Claymore's CryptoNote": self.__etherium,
-            "Claymore's Dual Ethereum": self.__etherium,
-            "EWBF's CUDA ZCash": self.__zCash,
+            "antminer-s9-cgminer-490": self.__cGMiner,
+            "claymores-cryptonote-gpu-97": self.__etherium,
+            "claymores-dual-ethereum-amd-gpu-98": self.__etherium,
+            "ewbfs-cuda-zcash-034b": self.__zCash,
         }
 
     def __call__(self, miner, data):
@@ -252,9 +264,7 @@ class Converter():
         if miner in self.miners:
             return self.__supported_miners[miner](data)
         else:
-            raise ValueError(
-                "Unknown miner: '{miner}'".format(miner=miner),
-            )
+            return data
 
     @property
     def miners(self):
