@@ -14,6 +14,7 @@ from .zcash import ZCash
 from .etherium import Etherium
 from .monero import Monero
 from .cgminer import CGMiner
+from .miner import Miner
 
 
 class Sender():
@@ -40,6 +41,7 @@ class Sender():
             'ZCash': ZCash,
             'Monero': Monero,
             'CGMiner': CGMiner,
+            'Miner': Miner,
         }
 
         # Шаблон для проверки параметров опроса майнера
