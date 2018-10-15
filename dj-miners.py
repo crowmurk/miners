@@ -12,10 +12,13 @@ import json
 import logging
 import os
 import re
+import socket
 import sys
 
 from collections import namedtuple
 from copy import deepcopy
+from ipaddress import ip_address
+from pyzabbix import ZabbixMetric, ZabbixSender
 from systemd import journal
 
 from pyminers import Sender
@@ -132,7 +135,7 @@ class Worker():
             formatter = logging.Formatter()
         elif value == 'SY':
             # Запись лога в системный журнал
-            handler = journal.JournalHandler(SYSLOG_IDENTIFIER=journalName)
+            handler = journal.JournaldLogHandler(identifier=journalName)
             formatter = logging.Formatter('%(levelname)s: %(message)s')
         elif value == 'ST':
             # Вывод лога в stdout
@@ -152,6 +155,11 @@ class Worker():
         handler.setLevel(logging.INFO)
         handler.setFormatter(formatter)
         self.__logger.addHandler(handler)
+
+    def get_server_names(self):
+        """Возвращает словарь {task.id: server.name, }
+        """
+        return {task.id: task.server.name for task in self.__server_tasks}
 
     def save(self, data):
         """Добавляет результаты выполнения заданий в БД
@@ -436,6 +444,383 @@ class Converter():
                 }
 
 
+class Zabbix():
+    """Отправляет статистику работы майнеров на Zabbix серввер"""
+
+    def __init__(self, miners, server='127.0.0.1',
+                 port=10051, timeout=5, log='False'):
+        """Аргументы:
+           miners: результаты опроса майнеров, в формате dict
+           с параметрами запросов и полученными ответами:
+               {'id': {'Host': str, 'Port': int, 'Miner': str,
+                       'Exchange':[{'Request': str, 'Response': dict,
+                                    'Error': bool}, ],
+                       'Description': str }, }
+               где:
+                   id - netbios имя имя хоста или другой идентификатор
+                   Host - ip адрес хоста
+                   Port - порт майнера
+                   Miner - тип майнера
+                   Exchange - список запросов и ответов майнеров:
+                       Request - тип запроса
+                       Result - ответ от майнера
+                       Error - флаг успешности запроса
+                   Description - описание хоста (необязательное поле)
+
+           server: адрес сервера
+           port: порт сервера
+           log: логирование результатов работы, может принимать значения:
+               False - не вести лог
+               log - экземпляр logging.Logger
+               system - записть в системный лог systemd
+               stdout - вывод в стандартный поток
+               или принимает имя файла для записи лога
+        """
+
+        self.__supportedMiners = {
+            'CGMiner': self.__cGMiner,
+            'ZCash': self.__zCash,
+            'Monero': self.__etherium,
+            'Etherium': self.__etherium
+        }
+
+        self.miners = deepcopy(miners)
+        self.server = server
+        self.port = port
+        self.timeout = timeout
+        self.log = log
+
+        self.__createMetrics()
+
+    @property
+    def server(self):
+        """Адрес сервера"""
+        try:
+            return self.__server
+        except AttributeError:
+            return None
+
+    @server.setter
+    def server(self, value):
+        """Адрес сервера, должен быть из диапазона частных сетей"""
+        try:
+            address = ip_address(value)
+        except ValueError as e:
+            raise ValueError(
+                "server = {message}".format(message=e),
+            ) from None
+
+        if address.is_private:
+            self.__server = value
+        else:
+            raise ValueError(
+                "server = '{address}' address does "
+                "not appear to be in private network".format(
+                    address=address,
+                ),
+            )
+
+    @property
+    def port(self):
+        """Порт сервера"""
+        try:
+            return self.__port
+        except AttributeError:
+            return None
+
+    @port.setter
+    def port(self, value):
+        """Порт сервера, должен находится в
+        передлах от 1  до 65535 и быть целым числом
+        """
+        if value in range(1, 65536):
+            self.__port = value
+        else:
+            raise ValueError(
+                "port = '{port}' port must be "
+                "in range 1..65535".format(port=value),
+            )
+
+    @property
+    def timeout(self):
+        """Время ожидани ответа Zabbix"""
+        try:
+            return self.__timeout
+        except AttributeError:
+            return None
+
+    @timeout.setter
+    def timeout(self, value):
+        """Время ожидани ответа Zabbix, должно быть в
+        пределах от 1 до 60 и быть целым
+        """
+        if value in range(1, 61):
+            self.__timeout = value
+            self.__error = False
+        else:
+            raise ValueError(
+                "Zabbix response timeout '{timeout}'"
+                " must be in range 1..60".format(timeout=value),
+            )
+
+    @property
+    def log(self):
+        """log: логирование результатов работы"""
+        try:
+            return self.__logger
+        except AttributeError:
+            return None
+
+    @log.setter
+    def log(self, value):
+        """log: логирование результатов работы, может принимать значения:
+        False - не вести лог
+        log - экземпляр logging.Logger
+        system - записть в системный лог systemd
+        stdout - вывод в стандартный поток
+        или принимает имя файла для записи лога
+        """
+
+        if isinstance(value, logging.Logger):
+            self.__logger = value
+            return None
+
+        journalName = 'minigstatistic'
+
+        timeformat = "%Y.%m.%d-%H:%M:%S"
+
+        self.__logger = logging.getLogger(journalName)
+        self.__logger.setLevel(logging.INFO)
+
+        if value == 'False':
+            # Не вести лог
+            handler = logging.NullHandler()
+            formatter = logging.Formatter()
+        elif value == 'journal':
+            # Запись лога в системный журнал
+            handler = journal.JournalHandler(SYSLOG_IDENTIFIER=journalName)
+            formatter = logging.Formatter('%(levelname)s: %(message)s')
+        elif value == 'stdout':
+            # Вывод лога в stdout
+            handler = logging.StreamHandler(sys.stdout)
+            formatter = logging.Formatter(
+                '[%(asctime)s] %(name)s: %(levelname)s: %(message)s',
+                timeformat,
+            )
+        else:
+            # Запись лога в файл
+            handler = logging.FileHandler(value)
+            formatter = logging.Formatter(
+                '[%(asctime)s] %(name)s: %(levelname)s: %(message)s',
+                timeformat,
+            )
+
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(formatter)
+        self.__logger.addHandler(handler)
+
+    @property
+    def metrics(self):
+        try:
+            self.__metrics
+        except AttributeError:
+            return None
+
+        return deepcopy(self.__metrics)
+
+    def send(self):
+        """Отправляет статистику работы майнеров на серввер"""
+
+        for name, metrics in self.__metrics.items():
+            server = ZabbixSender(
+                self.server,
+                self.port,
+                chunk_size=len(metrics),
+            )
+            try:
+                self.log.info(
+                    "metrics sended to {server}:{port} "
+                    "for {miner} ({result})".format(
+                        server=self.server,
+                        port=self.port,
+                        miner=name,
+                        result=server.send(metrics),
+                    ),
+                )
+            except socket.error as e:
+                self.log.error(
+                    "error on sending metrics to {server}:{port} "
+                    "for {miner} ({message})".format(
+                        server=self.server,
+                        port=self.port,
+                        miner=name, message=e,
+                    ),
+                )
+                break
+
+    def __createMetrics(self):
+        """Формирует метрики для отправки статистики на сервер"""
+        self.__metrics = {}
+
+        for name, data in self.miners.items():
+            # Ищем ошибки
+            errorResponses = [
+                item['Response']
+                for item in data['Exchange']
+                if item['Error']]
+            # Если при получении статистики работы майнера произошла ошибка
+            if errorResponses:
+                # Создаем соответвующую метрику
+                self.__metrics[name] = [ZabbixMetric(
+                    name,
+                    'miner.status', 0), ]
+                # Записываем сообщение в лог
+                self.log.error(
+                    "error in request for miner {name} at "
+                    "{host}:{port} ({message})".format(
+                        name=name,
+                        host=data['Host'],
+                        port=data['Port'],
+                        message=errorResponses[0],
+                    ),
+                )
+            else:
+                # Создаем все метрики для майнера
+                self.__metrics[name] = [
+                    ZabbixMetric(name, key, value)
+                    for key, value in
+                    self.__supportedMiners[data['Miner']](data['Exchange'])]
+
+    @staticmethod
+    def __cGMiner(value):
+
+        # К маинеру делается два запроса. В зависимости от
+        # того какой ответ попал в список первым назначаем переменные
+        if 'SUMMARY' in value[0]['Response']:
+            summary = deepcopy(value[0]['Response']['SUMMARY'][0])
+            stats = deepcopy(value[1]['Response']['STATS'][0])
+        else:
+            summary = deepcopy(value[1]['Response']['SUMMARY'][0])
+            stats = deepcopy(value[0]['Response']['STATS'][0])
+
+        metric = {}
+        metric['miner.status'] = 1
+        metric['miner.version'] = stats['miner_version']
+        metric['miner.uptime'] = summary['Elapsed']
+        metric['miner.shares'] = summary['Accepted']
+        metric['miner.shares.rejected'] = summary['Rejected']
+        metric['miner.hashrate.average'] = summary['GHS av']
+        metric['miner.lastgetwork'] = summary['Last getwork']
+        metric['miner.temperature.max'] = stats['temp_max']
+        metric['miner.acn.total'] = stats['total_acn']
+        metric['miner.fan.number'] = stats['fan_num']
+
+        template = re.compile('^fan[0-9]+$')
+        speed = [item for _, item in stats.items()
+                 if bool(template.match(_)) and item]
+        metric['miner.fan.discovery'] = json.dumps({
+            'data': [{'{#FANID}': str(num)}
+                     for num in range(metric['miner.fan.number'])]})
+
+        for num, item in enumerate(speed):
+            metric['miner.fan.speed[{fan}]'.format(fan=num)] = speed[num]
+
+        return metric.items()
+
+    @staticmethod
+    def __zCash(value):
+        value = value[0]['Response']
+
+        metric = {}
+        metric['miner.status'] = 1
+        metric['miner.gpu.number'] = len(value)
+        metric['miner.shares'] = sum(
+            [item['accepted_shares'] for item in value])
+        metric['miner.shares.rejected'] = sum(
+            [item['rejected_shares'] for item in value])
+        try:
+            metric['miner.shares.rejected.percent'] = round(
+                metric['miner.shares.rejected'] * 100 / metric['miner.shares'], 4)
+        except ZeroDivisionError:
+            metric['miner.shares.rejected.percent'] = float(0)
+
+        metric['miner.gpu.discovery'] = json.dumps(
+            {'data': [{'{#GPUID}': str(num)}
+                      for num in range(metric['miner.gpu.number'])]}
+        )
+
+        for num, item in enumerate(value):
+            metric['miner.gpu.status[{gpu}]'.format(
+                gpu=num)] = item['gpu_status']
+            metric['miner.gpu.shares[{gpu}]'.format(
+                gpu=num)] = item['accepted_shares']
+            metric['miner.gpu.shares.rejected[{gpu}]'.format(
+                gpu=num)] = item['rejected_shares']
+            metric['miner.gpu.speed[{gpu}]'.format(
+                gpu=num)] = item['speed_sps']
+            metric['miner.gpu.powerusage[{gpu}]'.format(
+                gpu=num)] = item['gpu_power_usage']
+            metric['miner.gpu.temperature[{gpu}]'.format(
+                gpu=num)] = item['temperature']
+
+        return metric.items()
+
+    @staticmethod
+    def __etherium(value):
+        value = value[0]['Response']
+
+        metric = {}
+        metric['miner.status'] = 1
+        metric['miner.uptime'] = value['Uptime'] * 60
+        metric['miner.version'] = '{type}-{version}'.format(
+            type=value['Version']['Type'],
+            version=value['Version']['Number'],
+        )
+
+        metric['miner.eth.hashrate'] = value['ETH']['Hashrate'] * 10**6
+        metric['miner.eth.shares'] = value['ETH']['Shares']
+        metric['miner.eth.shares.rejected'] = value['ETH']['Rejected']
+        try:
+            metric['miner.eth.shares.rejected.percent'] = round(
+                metric['miner.eth.shares.rejected'] * 100 / metric['miner.eth.shares'], 4)
+        except ZeroDivisionError:
+            metric['miner.eth.shares.rejected.percent'] = float(0)
+
+        metric['miner.dcr.hashrate'] = value['DCR']['Hashrate'] * 10**6
+        metric['miner.dcr.shares'] = value['DCR']['Shares']
+        metric['miner.dcr.shares.rejected'] = value['DCR']['Rejected']
+        try:
+            metric['miner.dcr.shares.rejected.percent'] = round(
+                metric['miner.dcr.shares.rejected'] * 100 / metric['miner.dcr.shares'], 4)
+        except ZeroDivisionError:
+            metric['miner.dcr.shares.rejected.percent'] = float(0)
+
+        metric['miner.gpu.number'] = len(value['ETH Detailed'])
+        metric['miner.gpu.discovery'] = json.dumps(
+            {'data': [{'{#GPUID}': str(num)}
+                      for num in range(metric['miner.gpu.number'])]}
+        )
+
+        for index, item in enumerate(value['ETH Detailed']):
+            if not isinstance(item, int):
+                value['ETH Detailed'][index] = 0
+
+        for index, item in enumerate(value['DCR Detailed']):
+            if not isinstance(item, int):
+                value['DCR Detailed'][index] = 0
+
+        for num, _ in enumerate(value['ETH Detailed']):
+            metric['miner.gpu.dcr.hashrate[{gpu}]'.format(
+                gpu=num)] = value['DCR Detailed'][num] * 10**6
+            metric['miner.gpu.eth.hashrate[{gpu}]'.format(
+                gpu=num)] = value['ETH Detailed'][num] * 10**6
+            metric['miner.gpu.fspeed[{gpu}]'.format(
+                gpu=num)] = value['GPU']['Fan Speeds'][num]
+            metric['miner.gpu.temperature[{gpu}]'.format(
+                gpu=num)] = value['GPU']['Temperatures'][num]
+        return metric.items()
+
+
 def main():
     # Загружаем задания из БД
     works = Worker(config='Develop')
@@ -447,7 +832,21 @@ def main():
     # Добавление результатов в БД
     works.save(sender.results)
 
-    # TODO Проверка отправки Zabbix
+    # Отправляем собранные данные Zabbix серверу
+    if works.config.zabbix_send:
+        # Меняем ID задания на имя сервера
+        server_names = works.get_server_names()
+        zabbix_data = {server_names[key]: value
+                       for key, value in sender.union.items()}
+
+        zabbix = Zabbix(
+            zabbix_data,
+            works.config.zabbix_server,
+            works.config.zabbix_port,
+            works.config.zabbix_timeout,
+            works.log,
+        )
+        zabbix.send()
 
 
 if __name__ == '__main__':
