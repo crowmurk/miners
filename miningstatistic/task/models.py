@@ -31,6 +31,7 @@ class Config(models.Model):
     name = models.CharField(
         max_length=31,
         unique=True,
+        verbose_name='Имя',
     )
     slug = models.SlugField(
         max_length=63,
@@ -43,12 +44,14 @@ class Config(models.Model):
     )
     enabled = models.BooleanField(
         default=False,
+        verbose_name='Активна',
     )
     refresh = models.PositiveSmallIntegerField(
         default=30,
         validators=[
             MinValueValidator(10),
         ],
+        verbose_name='Интервал опроса серверов',
         help_text='Интервал опроса серверов (сек.).',
     )
     zabbix_server = models.GenericIPAddressField(
@@ -57,6 +60,7 @@ class Config(models.Model):
         validators=[
             validate_ipv46_address,
         ],
+        verbose_name='Адрес Zabbix сервера',
     )
     zabbix_port = models.PositiveIntegerField(
         blank=True,
@@ -65,6 +69,7 @@ class Config(models.Model):
             MinValueValidator(0),
             MaxValueValidator(65535),
         ],
+        verbose_name='Порт Zabbix сервера',
     )
     zabbix_timeout = models.PositiveSmallIntegerField(
         blank=True,
@@ -73,15 +78,17 @@ class Config(models.Model):
             MinValueValidator(1),
             MaxValueValidator(60),
         ],
+        verbose_name='Таймаут Zabbix сервера',
     )
     zabbix_send = models.BooleanField(
         default=False,
-        help_text='Отправлять статистику Zabbix серверу.',
+        verbose_name='Отправлять статистику Zabbix',
     )
     log = models.CharField(
         max_length=2,
         choices=LOG_CHOICES,
         default=SYSTEM,
+        verbose_name='Лог',
     )
     log_file = models.CharField(
         max_length=4096,
@@ -91,15 +98,18 @@ class Config(models.Model):
                 regex=r"^/[^\0]*[^\0/]+$",
                 message="Путь к файлу должен соответствовать POSIX",
             ),
-        ]
+        ],
+        verbose_name='Файл лога',
     )
     description = models.CharField(
         max_length=255,
         blank=True,
+        verbose_name='Описание',
     )
 
     class Meta:
         verbose_name = 'Конфигурация'
+        verbose_name_plural = 'Конфигурации'
         ordering = ['-enabled', 'name', ]
 
     def __str__(self):
@@ -156,11 +166,13 @@ class ServerTask(models.Model):
     server = models.ForeignKey(
         Server,
         on_delete=models.CASCADE,
-        related_name='tasks'
+        related_name='tasks',
+        verbose_name='Сервер',
     )
     requests = models.ManyToManyField(
         Request,
         related_name='tasks',
+        verbose_name='Запросы',
     )
     timeout = models.PositiveSmallIntegerField(
         default=5,
@@ -168,21 +180,24 @@ class ServerTask(models.Model):
             MinValueValidator(1),
             MaxValueValidator(60),
         ],
+        verbose_name='Таймаут',
     )
     enabled = models.BooleanField(
         default=False,
+        verbose_name='Активно',
     )
     executed = models.DateTimeField(
         null=True,
-        help_text='Время последнего запуска',
+        verbose_name='Последний запуск',
     )
     status = models.BooleanField(
         null=True,
-        help_text='Результат последнего запуска',
+        verbose_name='Результат',
     )
 
     class Meta:
         verbose_name = 'Опрос сервера'
+        verbose_name_plural = 'Опросы серверов'
         ordering = ['-enabled', 'server', ]
 
     def __str__(self):
@@ -192,7 +207,7 @@ class ServerTask(models.Model):
             requests=', '.join(
                 [request.name for request in self.requests.all()],
             ),
-            enabled='Активно' if self.enabled else 'Выключено',
+            enabled='Активен' if self.enabled else 'Выключен',
         )
 
     def get_absolute_url(self):

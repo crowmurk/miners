@@ -11,8 +11,14 @@ from core.validators import validate_json, validate_slug
 # Create your models here.
 
 class Miner(models.Model):
-    name = models.CharField(max_length=31)
-    version = models.CharField(max_length=31)
+    name = models.CharField(
+        max_length=31,
+        verbose_name='Майнер',
+    )
+    version = models.CharField(
+        max_length=31,
+        verbose_name='Версия',
+    )
     slug = models.SlugField(
         max_length=63,
         unique=True,
@@ -25,10 +31,12 @@ class Miner(models.Model):
     description = models.CharField(
         max_length=255,
         blank=True,
+        verbose_name='Описание',
     )
 
     class Meta:
         verbose_name = 'Майнер'
+        verbose_name_plural = 'Майнеры'
         ordering = ['name', 'version']
         unique_together = (('name', 'version'),)
 
@@ -63,7 +71,10 @@ class Miner(models.Model):
 
 
 class Request(models.Model):
-    name = models.CharField(max_length=31)
+    name = models.CharField(
+        max_length=31,
+        verbose_name='Имя',
+    )
     slug = models.SlugField(
         max_length=31,
         editable=False,
@@ -77,26 +88,31 @@ class Request(models.Model):
         validators=[
             validate_json,
         ],
+        verbose_name='Запрос',
     )
     response = models.TextField(
         blank=True,
-        help_text='Шаблон проверки ответа',
         validators=[
             validate_json,
         ],
+        verbose_name='Ответ',
+        help_text='Шаблон проверки ответа',
     )
     description = models.CharField(
         max_length=255,
         blank=True,
+        verbose_name='Описание',
     )
     miner = models.ForeignKey(
         Miner,
         on_delete=models.CASCADE,
         related_name='requests',
+        verbose_name='Майнер',
     )
 
     class Meta:
         verbose_name = 'Запрос'
+        verbose_name_plural = 'Запросы'
         ordering = ['miner', 'name']
         unique_together = (('miner', 'slug'),)
 
@@ -138,6 +154,7 @@ class Server(models.Model):
     name = models.CharField(
         max_length=31,
         unique=True,
+        verbose_name='Имя',
     )
     slug = models.SlugField(
         max_length=31,
@@ -151,27 +168,32 @@ class Server(models.Model):
     host = models.GenericIPAddressField(
         validators=[
             validate_ipv46_address,
-        ]
+        ],
+        verbose_name='Адрес',
+    )
+    miner = models.ForeignKey(
+        Miner,
+        on_delete=models.CASCADE,
+        related_name='servers',
+        verbose_name='Майнер',
     )
     port = models.PositiveIntegerField(
         default=1,
         validators=[
             MinValueValidator(0),
             MaxValueValidator(65535),
-        ]
-    )
-    miner = models.ForeignKey(
-        Miner,
-        on_delete=models.CASCADE,
-        related_name='servers'
+        ],
+        verbose_name='Порт',
     )
     description = models.CharField(
         max_length=255,
         blank=True,
+        verbose_name='Описание',
     )
 
     class Meta:
         verbose_name = 'Сервер'
+        verbose_name_plural = 'Серверы'
         ordering = ['name']
 
     def __str__(self):

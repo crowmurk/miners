@@ -23,6 +23,7 @@ class ServerStatistic(models.Model):
         ServerTask,
         on_delete=models.CASCADE,
         related_name='statistic',
+        verbose_name='Задание',
     )
     request_id = models.IntegerField(
         validators=[
@@ -34,19 +35,20 @@ class ServerStatistic(models.Model):
         validators=[
             validate_json,
         ],
-        help_text='Результат выполнения задания',
+        verbose_name='Результат опроса',
     )
     executed = models.DateTimeField(
-        help_text='Время выполнения задания',
+        verbose_name='Время выполнения',
     )
     status = models.BooleanField(
-        help_text='Статус выполнения задания',
+        verbose_name='Статус завершения',
     )
 
     objects = ServerStatisticQueryset.as_manager()
 
     class Meta:
-        verbose_name = 'Статистика работы серверов'
+        verbose_name = 'Статистика сервера'
+        verbose_name_plural = 'Статистика серверов'
         ordering = ['-request_id', 'task', '-status']
 
     def __str__(self):
