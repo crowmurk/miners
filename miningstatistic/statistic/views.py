@@ -18,6 +18,7 @@ from .tables import (
 
 class ServerStatisticList(MultiTableMixin, TemplateView):
     template_name = 'statistic/serverstatistic_list.html'
+    model = ServerStatistic
 
     def get_tables(self):
         def get_data_list(data):
@@ -38,7 +39,7 @@ class ServerStatisticList(MultiTableMixin, TemplateView):
         tables = []
 
         # Результаты последнего опроса
-        last_data = ServerStatistic.objects.results_last()
+        last_data = self.model.objects.results_last()
 
         for miner in Miner.objects.all():
             # Сооздаем таблицу с ошибками
@@ -77,4 +78,5 @@ class ServerStatisticList(MultiTableMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['now'] = timezone.now()
         context['update_interval'] = Config.objects.get(enabled=True).refresh
+        context['model'] = self.model
         return context

@@ -21,7 +21,14 @@ from .utils import (
 
 # Create your views here.
 
-class MinerList(ListView):
+class ListViewMixin():
+    def get_context_data(self):
+        context = super(ListView, self).get_context_data()
+        context['model'] = self.model
+        return context
+
+
+class MinerList(ListViewMixin, ListView):
     model = Miner
     paginate_by = 7
 
@@ -102,7 +109,7 @@ class RequestDelete(
             return self.object.miner.get_absolute_url()
 
 
-class ServerList(ListView):
+class ServerList(ListViewMixin, ListView):
     model = Server
     paginate_by = 7
 
