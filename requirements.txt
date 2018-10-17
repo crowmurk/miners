@@ -20,6 +20,8 @@ prompt-toolkit==2.0.6
 ptyprocess==0.6.0
 py-zabbix==1.1.5
 Pygments==2.2.0
+pygraphviz==1.5
+pyparsing==2.2.2
 pytz==2018.5
 requests==2.19.1
 simplegeneric==0.8.1
