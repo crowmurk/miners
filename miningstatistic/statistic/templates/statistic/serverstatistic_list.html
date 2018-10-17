@@ -1,8 +1,9 @@
 {% extends "statistic/base_statistic.html" %}
 {% load django_tables2 %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Статистика
+    {{ block.super }} - {{ model|verbose_name_plural }}
 {% endblock %}
 
 {% block head %}
@@ -19,6 +20,8 @@
             </h5>
             {% render_table table %}
         {% endif %}
+    {% empty %}
+        <li><em>{{ model|verbose_name_plural }} отсутствует.</em></li>
     {% endfor %}
 {% endblock %}
 

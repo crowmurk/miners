@@ -1,33 +1,30 @@
 {% extends "task/base_task.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Конфигурации
+    {{ block.super }} - {{ model|verbose_name_plural }}
 {% endblock %}
 
 {% block create_button %}
-    <a href="{% url 'task:config:create' %}" class="button button-primary">Добавить конфигурацию</a>
+    <a href="{% url 'task:config:create' %}" class="button button-primary">Добавить</a>
 {% endblock %}
 
 {% block task_content %}
     <div class="offset-by-two ten columns">
-        <h2>Конфигурации</h2>
+        <h2>{{ model|verbose_name_plural }}</h2>
         <ul>
             {% for config in object_list %}
                 <li>
                     <a href="{{ config.get_absolute_url }}">{{ config.name }}</a>
-                        {% if config.enabled %}
-                            (<strong>Активна</strong>):
-                        {% else %}
-                            (Выключена):
-                        {% endif %}
-                            {{ config.description }}
+                        ({{ config.enabled|yesno:"<strong>Активна</strong>,Выключена"|safe }})
+                        {{ config.description }}
                     <ul class=inline>
                         <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>
                     </ul>
                 </li>
             {% empty %}
-                <li><em>Конфигурации отсутствуют.</em></li>
+                <li><em>{{ model|verbose_name_plural }} отсутствуют.</em></li>
             {% endfor %}
         </ul>
     </div>

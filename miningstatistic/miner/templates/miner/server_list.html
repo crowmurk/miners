@@ -1,28 +1,29 @@
 {% extends "miner/base_miner.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Серверы
+    {{ block.super }} - {{ model|verbose_name_plural }}
 {% endblock %}
 
 {% block create_button %}
-    <a href="{% url 'miner:server:create' %}" class="button button-primary">Добавить сервер</a>
+    <a href="{% url 'miner:server:create' %}" class="button button-primary">Добавить</a>
 {% endblock %}
 
 {% block miner_content %}
     <div class="offset-by-two ten columns">
-    <h2>Серверы</h2>
-    <ul>
-        {% for server in object_list %}
-            <li>
-                <a href="{{ server.get_absolute_url }}">{{ server }}</a>
-                <ul class=inline>
-                    <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
-                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
-                </ul>
-            </li>
-        {% empty %}
-            <li><em>Серверы отсутствуют.</em></li>
-        {% endfor %}
-    </ul>
+        <h2>{{ model|verbose_name_plural }}</h2>
+        <ul>
+            {% for server in object_list %}
+                <li>
+                    <a href="{{ server.get_absolute_url }}">{{ server }}</a>
+                    <ul class=inline>
+                        <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
+                        <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li><em>{{ model|verbose_name_plural }} отсутствуют.</em></li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}

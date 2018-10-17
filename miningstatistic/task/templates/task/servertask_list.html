@@ -1,47 +1,39 @@
 {% extends "task/base_task.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Задания
+    {{ block.super }} - {{ model|verbose_name_plural }}
 {% endblock %}
 
 {% block create_button %}
-    <a href="{% url 'task:server:create' %}" class="button button-primary">Добавить задание</a>
+    <a href="{% url 'task:server:create' %}" class="button button-primary">Добавить</a>
 {% endblock %}
 
 {% block task_content %}
     <div class="offset-by-two ten columns">
-        <h2>Задания</h2>
+        <h2>{{ model|verbose_name_plural }}</h2>
         <ul>
             {% for servertask in object_list %}
                 <li>
-                    <a href="{{ servertask.get_absolute_url }}">Задание #{{ servertask.pk }}</a>
+                    <a href="{{ servertask.get_absolute_url }}">{{ servertask|verbose_name }} #{{ servertask.pk }}</a>
                     : {{ servertask.server }}
                     (
                     {% for request in servertask.requests.all %}
                         {{ request.name }},
                     {% endfor %}
                     )
-                    {% if servertask.enabled %}
-                        - <strong>Активно</strong>
-                    {% else %}
-                        - Выключено
-                    {% endif %}
+                    {{ servertask.enabled|yesno:"<strong>Активно</strong>,Выключено"|safe }}
                     {% if servertask.executed %}
                         - {{ servertask.executed }}
                     {% endif %}
-                    {% if servertask.status %}
-                        - Успех
-                    {% endif %}
-                    {% if servertask.status is False %}
-                        - <strong>Ошибка</strong>
-                    {% endif %}
+                    - {{ servertask.status|yesno:"Успех,<strong>Ошибка</strong>,Неизвестно"|safe }}
                     <ul class=inline>
                         <li><a href="{{ servertask.get_update_url }}" class="button">Изменить</a></li>
                         <li><a href="{{ servertask.get_delete_url }}" class="button">Удалить</a></li>
                     </ul>
                 </li>
             {% empty %}
-                <li><em>Задания отсутствуют.</em></li>
+                <li><em>{{ model|verbose_name_plural }} отсутствуют.</em></li>
             {% endfor %}
         </ul>
     </div>

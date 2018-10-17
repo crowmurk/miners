@@ -1,16 +1,17 @@
 {% extends "miner/base_miner.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Майнеры
+    {{ block.super }} - {{ model|verbose_name_plural }}
 {% endblock %}
 
 {% block create_button %}
-    <a href="{% url 'miner:miner:create' %}" class="button button-primary">Добавить майнер</a>
+    <a href="{% url 'miner:miner:create' %}" class="button button-primary">Добавить</a>
 {% endblock %}
 
 {% block miner_content %}
     <div class="offset-by-two ten columns">
-        <h2>Майнеры</h2>
+        <h2>{{ model|verbose_name_plural }}</h2>
         <ul>
             {% for miner in object_list %}
                 <li>
@@ -21,7 +22,7 @@
                     </ul>
                 </li>
             {% empty %}
-                <li><em>Майнеры отсутствуют.</em></li>
+                <li><em>{{ model|verbose_name_plural }} отсутствуют.</em></li>
             {% endfor %}
         </ul>
     </div>
