@@ -5,21 +5,30 @@ register = template.Library()
 
 @register.filter
 def verbose_name(obj):
-    """Получает verbose_name модели
+    """Фильтр получает verbose_name модели
     """
     return getattr(obj._meta, 'verbose_name', '')
 
 
 @register.filter
 def verbose_name_plural(obj):
-    """Получает verbose_name_plural модели
+    """Фильтр получает verbose_name_plural модели
     """
     return getattr(obj._meta, 'verbose_name_plural', '')
 
 
 @register.simple_tag
 def field_verbose_name(obj, field):
-    """Тег получает verbose_name
-    поля заданой модели
+    """Тег получает verbose_name поля заданой модели
     """
-    return getattr(obj._meta.get_field(field), 'verbose_name', '')
+    field = obj._meta.get_field(field)
+
+    if hasattr(field, 'verbose_name'):
+        # Обычное поле или RelationField forward
+        return getattr(field, 'verbose_name', '')
+    try:
+        # RelationField reverce
+        related_model_meta = field.related_model._meta
+    except AttributeError:
+        return ''
+    return getattr(related_model_meta, 'verbose_name_plural', '')
