@@ -2,11 +2,108 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from core.utils import get_unique_slug
+from core.templatetags import names
 
 from miner.models import Miner, Request, Server
-from task.models import Server as Task
+from task.models import ServerTask
 
 # Create your tests here.
+
+class VerboseNameFilterTest(TestCase):
+    """Тестирование фильтра verbose_name
+    """
+
+    def test_model_verbose_name(self):
+        """Тестирование фильтра verbose_name модели
+        """
+        self.assertEqual(
+            names.verbose_name(Miner),
+            'Майнер',
+        )
+
+    def test_instance_verbose_name(self):
+        """Тестирование фильтра verbose_name экземпляра
+        """
+        # Создаем объект
+        miner = Miner(
+            name='Some Miner',
+            version='1.0.0',
+        )
+        self.assertEqual(
+            names.verbose_name(miner),
+            'Майнер',
+        )
+
+
+class VerboseNamePluralFilterTest(TestCase):
+    """Тестирование фильтра verbose_name_plural
+    """
+
+    def test_model_verbose_name_plural(self):
+        """Тестирование фильтра verbose_name_plural модели
+        """
+        self.assertEqual(
+            names.verbose_name_plural(Miner),
+            'Майнеры',
+        )
+
+    def test_instance_verbose_name_plural(self):
+        """Тестирование фильтра verbose_name_plural экземпляра
+        """
+        # Создаем объект
+        miner = Miner(
+            name='Some Miner',
+            version='1.0.0',
+        )
+        self.assertEqual(
+            names.verbose_name_plural(miner),
+            'Майнеры',
+        )
+
+
+class FieldVerboseNameTagTest(TestCase):
+    """Тестирование тега field_verbose_name
+    """
+
+    def test_model_common_field_verbose_name(self):
+        """Тестирование тега field_verbose_name, обыное поле
+        """
+        self.assertEqual(
+            names.field_verbose_name(Miner, 'name'),
+            'Майнер')
+
+    def test_model_foreign_field_verbose_name(self):
+        """Тестирование тега field_verbose_name, поле ForeignKey
+        """
+        self.assertEqual(
+            names.field_verbose_name(Request, 'miner'),
+            'Майнер',
+        )
+
+    def test_model_foreign_field_reverse_verbose_name(self):
+        """Тестирование тега field_verbose_name,
+        поле ForeignKey обратная связь
+        """
+        self.assertEqual(
+            names.field_verbose_name(Miner, 'requests'),
+            'Запросы')
+
+    def test_model_many_to_many_field_verbose_name(self):
+        """Тестирование тега field_verbose_name,
+        поле ManyToManyField
+        """
+        self.assertEqual(
+            names.field_verbose_name(ServerTask, 'requests'),
+            'Запросы')
+
+    def test_model_many_to_many_field_reverse_verbose_name(self):
+        """Тестирование тега field_verbose_name,
+        поле ManyToManyField, обратная связь
+        """
+        self.assertEqual(
+            names.field_verbose_name(Request, 'tasks'),
+            'Опросы серверов')
+
 
 class SlugValidatorTest(TestCase):
     """Тестирование валидатора slug
@@ -322,5 +419,5 @@ class PreSaveGetSlugTest(TestCase):
         )
 
         # Создаем объект, параметры slug для которого не заданы
-        task = Task(server=server)
+        task = ServerTask(server=server)
         task.save()
