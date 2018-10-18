@@ -1,30 +1,31 @@
 {% extends "miner/base_miner.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - {{ server }}
+    {{ block.super }} – {{ server|verbose_name }}: {{ server.name }}
 {% endblock %}
 
 {% block miner_content %}
     <article>
         <div class="row">
             <div class="offset-by-two eight columns">
-                <h3>Сервер: {{ server.name }}</h3>
+                <h3>{{ server|verbose_name }}: {{ server.name }}</h3>
                 <ul class="inline">
-                    <li><a href="{{ server.get_update_url }}" class="button">Изменить сервер</a></li>
-                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить сервер</a></li>
+                    <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
+                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
                 </ul>
                 <dl>
-                    <dt><strong>Адрес:</strong></dt>
+                    <dt><strong>{% field_verbose_name server 'host' %}:</strong></dt>
                     <dd>{{ server.host }}</dd>
-                    <dt><strong>Порт:</strong></dt>
-                    <dd>{{ server.port }}</dd>
                     {% if server.description %}
-                        <dt><strong>Описание:</strong></dt>
-                        <dd>{{ server.description|linebreaks }}</dd>
+                        <dt><strong>{% field_verbose_name server 'description' %}:</strong></dt>
+                        <dd>{{ server.description }}</dd>
                     {% endif %}
                     {% if server.miner %}
-                        <dt><strong>Установлен майнер:</strong></dt>
+                        <dt><strong>{% field_verbose_name server 'miner' %}:</strong></dt>
                         <dd><a href="{{ server.miner.get_absolute_url }}">{{ server.miner }}</a></dd>
+                        <dt><strong>{% field_verbose_name server 'port' %}:</strong></dt>
+                        <dd>{{ server.port }}</dd>
                     {% endif %}
                 </dl>
             </div>

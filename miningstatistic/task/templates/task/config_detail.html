@@ -1,62 +1,55 @@
 {% extends "task/base_task.html" %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - {{ config }}
+    {{ block.super }} – {{ config|verbose_name }}: {{ config.name }}
 {% endblock %}
 
 {% block content %}
     <article>
         <div class="row">
             <div class="offset-by-two eight columns">
-                <h3>Конфигурация: {{ config.name }}</h3>
+                <h3>{{ config|verbose_name }}: {{ config.name }}</h3>
                 <ul class="inline">
-                    <li><a href="{{ config.get_update_url }}" class="button">Изменить конфигурацию</a></li>
-                    <li><a href="{{ config.get_delete_url }}" class="button">Удалить конфигурацию</a></li>
+                    <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
+                    <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>
                 </ul>
                 <dl>
-                    <qdt><strong>Активна:</strong></dt>
-                    {% if config.enabled %}
-                        <dd>Да</dd>
-                    {% else %}
-                        <dd>Нет</dd>
-                    {% endif %}
+                    <dt><strong>{% field_verbose_name config 'enabled' %}:</strong></dt>
+                    <dd>{{ config.enabled|yesno:'Да,Нет' }}</dd>
                     {% if config.description %}
-                        <dt><strong>Описание:</strong></dt>
-                        <dd>{{ config.description|linebreaks }}</dd>
+                        <dt><strong>{% field_verbose_name config 'description' %}:</strong></dt>
+                        <dd>{{ config.description }}</dd>
                     {% endif %}
                 </dl>
                 <h5>Основные настройки:</h5>
                 <dl>
-                    <dt><strong>Интервал опроса серверов (сек.):</strong></dt>
+                    <dt><strong>{% field_verbose_name config 'refresh' %}:</strong></dt>
                     <dd>{{ config.refresh }}</dd>
-                    <dt><strong>Лог:</strong></dt>
+                    <dt><strong>{% field_verbose_name config 'log' %}:</strong></dt>
                     <dd>{{ config.get_log_display }}</dd>
                     {% if config.log_file %}
-                        <dt><strong>Файл логов:</strong></dt>
+                        <dt><strong>{% field_verbose_name config 'log_file' %}:</strong></dt>
                         <dd>{{ config.log_file }}</dd>
                     {% endif %}
                 </dl>
                 </dl>
-                <h5>Zabbix сервер:</h5>
+                <h5>Zabbix:</h5>
                 <dl>
                     {% if config.zabbix_server %}
-                        <dt><strong>Адрес:</strong></dt>
+                        <dt><strong>{% field_verbose_name config 'zabbix_server' %}:</strong></dt>
                         <dd>{{ config.zabbix_server }}</dd>
                     {% endif %}
                     {% if config.zabbix_port %}
-                        <dt><strong>Порт:</strong></dt>
+                        <dt><strong>{% field_verbose_name config 'zabbix_port' %}:</strong></dt>
                         <dd>{{ config.zabbix_port }}</dd>
                     {% endif %}
                     {% if config.zabbix_timeout %}
-                        <dt><strong>Таймаут:</strong></dt>
+                        <dt><strong>{% field_verbose_name config 'zabbix_timeout' %}:</strong></dt>
                         <dd>{{ config.zabbix_timeout }}</dd>
                     {% endif %}
-                    <dt><strong>Отправлять статистику:</strong></dt>
-                    {% if config.zabbix_send %}
-                        <dd>Да</dd>
-                    {% else %}
-                        <dd>Нет</dd>
-                    {% endif %}
+                    <dt><strong>{% field_verbose_name config 'zabbix_send' %}:</strong></dt>
+                    <dd>{{ config.zabbix_send|yesno:'Да,Нет' }}</dd>
                 </dl>
             </div>
         </div>
