@@ -1,8 +1,9 @@
 {% extends "miner/base_miner.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Удалить запрос
+    {{ block.super }} - Удалить {{ request|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}

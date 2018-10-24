@@ -1,8 +1,9 @@
 {% extends "task/base_task.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Удалить конфигурацию
+    {{ block.super }} - Удалить {{ config|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}

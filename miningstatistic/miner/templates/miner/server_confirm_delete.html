@@ -1,8 +1,9 @@
 {% extends "miner/base_miner.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
-    {{ block.super }} - Удалить сервер
+    {{ block.super }} - Удалить {{ server|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}
