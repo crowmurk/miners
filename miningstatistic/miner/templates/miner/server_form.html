@@ -1,20 +1,22 @@
 {% extends "miner/base_miner.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
     {{ block.super }}
     {% if server %}
-        - Изменить сервер
+        - Изменить
     {% else %}
-        - Создать сервер
+        - Создать
     {% endif %}
+    {{ view.model|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}
     {% if server %}
-        {% form server.get_update_url 'Изменить сервер' %}
+        {% form server.get_update_url 'Изменить' %}
     {% else %}
         {% url 'miner:server:create' as form_url %}
-        {% form form_url 'Создать сервер' %}
+        {% form form_url 'Создать' %}
     {% endif %}
 {% endblock %}

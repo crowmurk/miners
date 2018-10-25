@@ -1,21 +1,23 @@
 {% extends "task/base_task.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
     {{ block.super }}
     {% if servertask %}
-        - Изменить задание
+        - Изменить
     {% else %}
-        - Создать задание
+        - Создать
     {% endif %}
+    {{ view.model|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}
     {% if servertask %}
-        {% form servertask.get_update_url 'Изменить задание' %}
+        {% form servertask.get_update_url 'Изменить' %}
     {% else %}
         {% url 'task:server:create' as form_url %}
-        {% form form_url 'Создать задание' %}
+        {% form form_url 'Создать' %}
     {% endif %}
 {% endblock %}
 

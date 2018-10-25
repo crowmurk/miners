@@ -1,21 +1,22 @@
 {% extends "miner/base_miner.html" %}
 {% load forms %}
+{% load names %}
 
 {% block title %}
     {{ block.super }}
     {% if request  %}
-        - Изменить запрос
+        - Изменить
     {% else %}
-        - Создать запрос
+        - Создать
     {% endif %}
+    {{ view.model|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}
     {% if request and request.slug %}
-        {% form request.get_update_url 'Изменить запрос' %}
+        {% form request.get_update_url 'Изменить' %}
     {% else %}
         {% url 'miner:request:create' as form_url %}
-        {% form form_url 'Создать запрос' %}
+        {% form form_url 'Создать' %}
     {% endif %}
 {% endblock %}
-

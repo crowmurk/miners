@@ -1,5 +1,7 @@
 from django.template import Library, TemplateSyntaxError
 
+from core.templatetags.names import verbose_name
+
 register = Library()
 
 
@@ -13,19 +15,28 @@ def form(context, *args, **kwargs):
     # Формируем контекст для шаблона формы
     action = (args[0] if len(args) > 0
               else kwargs.get('action'))
-    button = (args[1] if len(args) > 1
-              else kwargs.get('button'))
+    action_verbose = (args[1] if len(args) > 1
+                      else kwargs.get('action_verbose'))
     method = (args[2] if len(args) > 2
               else kwargs.get('method'))
     form = context.get('form')
+    view = context.get('view')
+
+    if hasattr(view, 'model'):
+        action_verbose = ' '.join(
+            [action_verbose,
+             verbose_name(view.model).lower()],
+        )
+
     if action is None:
         raise TemplateSyntaxError(
             "form template tag requires "
             "at least one argument: action, "
             "which is a URL.")
+
     return {
         'action': action,
-        'button': button,
+        'action_verbose': action_verbose,
         'form': form,
         'method': method}
 
@@ -60,7 +71,8 @@ def delete_form(context, *args, **kwargs):
         object_name = str(display_object)
     object_type = kwargs.get(
         'obj_type',
-        display_object._meta.verbose_name.title())
+        verbose_name(display_object),
+    )
     return {
         'action': action,
         'form': form,
