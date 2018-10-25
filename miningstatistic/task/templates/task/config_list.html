@@ -2,7 +2,7 @@
 {% load names %}
 
 {% block title %}
-    {{ block.super }} - {{ model|verbose_name_plural }}
+    {{ block.super }} - {{ view.model|verbose_name_plural }}
 {% endblock %}
 
 {% block create_button %}
@@ -11,7 +11,7 @@
 
 {% block task_content %}
     <div class="offset-by-two ten columns">
-        <h2>{{ model|verbose_name_plural }}</h2>
+        <h2>{{ view.model|verbose_name_plural }}</h2>
         <ul>
             {% for config in object_list %}
                 <li>
@@ -24,7 +24,7 @@
                     </ul>
                 </li>
             {% empty %}
-                <li><em>{{ model|verbose_name_plural }} отсутствуют.</em></li>
+                <li><em>{{ view.model|verbose_name_plural }} отсутствуют.</em></li>
             {% endfor %}
         </ul>
     </div>

@@ -3,7 +3,7 @@
 {% load names %}
 
 {% block title %}
-    {{ block.super }} - {{ model|verbose_name_plural }}
+    {{ block.super }} - {{ view.model|verbose_name_plural }}
 {% endblock %}
 
 {% block head %}
@@ -21,7 +21,7 @@
             {% render_table table %}
         {% endif %}
     {% empty %}
-        <li><em>{{ model|verbose_name_plural }} отсутствует.</em></li>
+        <li><em>{{ view.model|verbose_name_plural }} отсутствует.</em></li>
     {% endfor %}
 {% endblock %}
 

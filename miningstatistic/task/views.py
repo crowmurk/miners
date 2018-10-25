@@ -12,14 +12,7 @@ from .forms import ConfigForm, ServerTaskForm
 
 # Create your views here.
 
-class ListViewMixin():
-    def get_context_data(self):
-        context = super(ListView, self).get_context_data()
-        context['model'] = self.model
-        return context
-
-
-class ConfigList(ListViewMixin, ListView):
+class ConfigList(ListView):
     model = Config
     paginate_by = 7
 
@@ -44,7 +37,7 @@ class ConfigDelete(DeleteView):
     success_url = reverse_lazy('task:config:list')
 
 
-class ServerTaskList(ListViewMixin, ListView):
+class ServerTaskList(ListView):
     model = ServerTask
     paginate_by = 7
 
