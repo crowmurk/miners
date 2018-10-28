@@ -1,9 +1,10 @@
 {% extends "task/base_task.html" %}
+{% load i18n %}
 {% load forms %}
 {% load names %}
 
 {% block title %}
-    {{ block.super }} - Удалить {{ config|verbose_name|lower }}
+    {{ block.super }} - {% trans "Delete" %} {{ config|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}

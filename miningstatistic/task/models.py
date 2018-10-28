@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
@@ -7,11 +8,10 @@ from django.core.validators import (
     RegexValidator,
 )
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-
-from miner.models import Server, Request
 
 from core.validators import validate_slug
+
+from miner.models import Server, Request
 
 # Create your models here.
 
@@ -22,16 +22,16 @@ class Config(models.Model):
     FILE = 'FI'
 
     LOG_CHOICES = (
-        (NOLOG, 'Выключить'),
-        (SYSTEM, 'Системный журнал'),
-        (STDOUT, 'Консоль'),
-        (FILE, 'Файл'),
+        (NOLOG, _('Disabled')),
+        (SYSTEM, _('Systemd journal')),
+        (STDOUT, _('STDOUT')),
+        (FILE, _('File')),
     )
 
     name = models.CharField(
         max_length=31,
         unique=True,
-        verbose_name='Имя',
+        verbose_name=_('Name'),
     )
     slug = models.SlugField(
         max_length=63,
@@ -40,19 +40,19 @@ class Config(models.Model):
         validators=[
             validate_slug,
         ],
-        help_text='URL идентификатор объекта',
+        help_text=_('A label for URL config.'),
     )
     enabled = models.BooleanField(
         default=False,
-        verbose_name='Активна',
+        verbose_name=_('Status'),
     )
     refresh = models.PositiveSmallIntegerField(
         default=30,
         validators=[
             MinValueValidator(10),
         ],
-        verbose_name='Интервал опроса серверов',
-        help_text='Интервал опроса серверов (сек.).',
+        verbose_name=_('Request interval'),
+        help_text=_('Request interval (sec.).'),
     )
     zabbix_server = models.GenericIPAddressField(
         blank=True,
@@ -60,7 +60,7 @@ class Config(models.Model):
         validators=[
             validate_ipv46_address,
         ],
-        verbose_name='Адрес Zabbix сервера',
+        verbose_name=_('Zabbix host'),
     )
     zabbix_port = models.PositiveIntegerField(
         blank=True,
@@ -69,7 +69,7 @@ class Config(models.Model):
             MinValueValidator(0),
             MaxValueValidator(65535),
         ],
-        verbose_name='Порт Zabbix сервера',
+        verbose_name=_('Zabbix port'),
     )
     zabbix_timeout = models.PositiveSmallIntegerField(
         blank=True,
@@ -78,44 +78,44 @@ class Config(models.Model):
             MinValueValidator(1),
             MaxValueValidator(60),
         ],
-        verbose_name='Таймаут Zabbix сервера',
+        verbose_name=_('Zabbix timeout'),
     )
     zabbix_send = models.BooleanField(
         default=False,
-        verbose_name='Отправлять статистику Zabbix',
+        verbose_name=_('Send statistic to Zabbix'),
     )
     log = models.CharField(
         max_length=2,
         choices=LOG_CHOICES,
         default=SYSTEM,
-        verbose_name='Лог',
+        verbose_name=_('Log'),
     )
     log_file = models.CharField(
         max_length=4096,
         blank=True,
         validators=[
             RegexValidator(
-                regex=r"^/[^\0]*[^\0/]+$",
-                message="Путь к файлу должен соответствовать POSIX",
+                regex=r'^/[^\0]*[^\0/]+$',
+                message=_('Path to the file must follow POSIX'),
             ),
         ],
-        verbose_name='Файл лога',
+        verbose_name=_('Log file'),
     )
     description = models.CharField(
         max_length=255,
         blank=True,
-        verbose_name='Описание',
+        verbose_name=_('Description'),
     )
 
     class Meta:
-        verbose_name = 'Конфигурация'
-        verbose_name_plural = 'Конфигурации'
+        verbose_name = _('Configuration')
+        verbose_name_plural = _('Configurations')
         ordering = ['-enabled', 'name', ]
 
     def __str__(self):
-        return "{name} ({active}): {description}".format(
+        return '{name} ({enabled}): {description}'.format(
             name=self.name,
-            active="Активна" if self.enabled else "Выключена",
+            enabled=_('Enabled') if self.enabled else _('Disabled'),
             description=self.description,
         )
 
@@ -148,9 +148,8 @@ class Config(models.Model):
                 raise ValidationError(
                     {
                         'enabled': ValidationError(
-                            _('Одновременно может быть включена'
-                              ' только одна конфигурация. В настоящее'
-                              ' время включена конфигурация: %(name)s'),
+                            _('Only one config can be enabled at a time.'
+                              ' "%(name)s" config is now enabled.'),
                             code='invalid',
                             params={
                                 # На случай если включена не одна конфигурация
@@ -167,12 +166,12 @@ class ServerTask(models.Model):
         Server,
         on_delete=models.CASCADE,
         related_name='tasks',
-        verbose_name='Сервер',
+        verbose_name=_('Server'),
     )
     requests = models.ManyToManyField(
         Request,
         related_name='tasks',
-        verbose_name='Запросы',
+        verbose_name=_('Requests'),
     )
     timeout = models.PositiveSmallIntegerField(
         default=5,
@@ -180,34 +179,34 @@ class ServerTask(models.Model):
             MinValueValidator(1),
             MaxValueValidator(60),
         ],
-        verbose_name='Таймаут',
+        verbose_name=_('Timeout'),
     )
     enabled = models.BooleanField(
         default=False,
-        verbose_name='Активно',
+        verbose_name=_('Status'),
     )
     executed = models.DateTimeField(
         null=True,
-        verbose_name='Последний запуск',
+        verbose_name=_('Last executed'),
     )
     status = models.BooleanField(
         null=True,
-        verbose_name='Результат',
+        verbose_name=_('Last status'),
     )
 
     class Meta:
-        verbose_name = 'Опрос сервера'
-        verbose_name_plural = 'Опросы серверов'
+        verbose_name = _('Server request')
+        verbose_name_plural = _('Servers requests')
         ordering = ['-enabled', 'server', ]
 
     def __str__(self):
-        return "{pk}: {server} ({requests}) - {enabled}".format(
+        return '{pk}: {server} ({requests}) - {enabled}'.format(
             pk=self.pk,
             server=self.server,
             requests=', '.join(
                 [request.name for request in self.requests.all()],
             ),
-            enabled='Активен' if self.enabled else 'Выключен',
+            enabled=_('Enabled') if self.enabled else _('Disabled'),
         )
 
     def get_absolute_url(self):

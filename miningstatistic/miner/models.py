@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
@@ -13,11 +14,11 @@ from core.validators import validate_json, validate_slug
 class Miner(models.Model):
     name = models.CharField(
         max_length=31,
-        verbose_name='Майнер',
+        verbose_name=_('Miner'),
     )
     version = models.CharField(
         max_length=31,
-        verbose_name='Версия',
+        verbose_name=_('Version'),
     )
     slug = models.SlugField(
         max_length=63,
@@ -26,17 +27,17 @@ class Miner(models.Model):
         validators=[
             validate_slug,
         ],
-        help_text='URL идентификатор объекта',
+        help_text=_('A label for URL config.'),
     )
     description = models.CharField(
         max_length=255,
         blank=True,
-        verbose_name='Описание',
+        verbose_name=_('Description'),
     )
 
     class Meta:
-        verbose_name = 'Майнер'
-        verbose_name_plural = 'Майнеры'
+        verbose_name = _('Miner')
+        verbose_name_plural = _('Miners')
         ordering = ['name', 'version']
         unique_together = (('name', 'version'),)
 
@@ -73,7 +74,7 @@ class Miner(models.Model):
 class Request(models.Model):
     name = models.CharField(
         max_length=31,
-        verbose_name='Имя',
+        verbose_name=_('Name'),
     )
     slug = models.SlugField(
         max_length=31,
@@ -81,38 +82,38 @@ class Request(models.Model):
         validators=[
             validate_slug,
         ],
-        help_text='URL идентификатор объекта',
+        help_text=_('A label for URL config.'),
     )
     request = models.TextField(
         max_length=255,
         validators=[
             validate_json,
         ],
-        verbose_name='Запрос',
+        verbose_name=_('Request'),
     )
     response = models.TextField(
         blank=True,
         validators=[
             validate_json,
         ],
-        verbose_name='Ответ',
-        help_text='Шаблон проверки ответа',
+        verbose_name=_('Response'),
+        help_text=_('Response template'),
     )
     description = models.CharField(
         max_length=255,
         blank=True,
-        verbose_name='Описание',
+        verbose_name=_('Description'),
     )
     miner = models.ForeignKey(
         Miner,
         on_delete=models.CASCADE,
         related_name='requests',
-        verbose_name='Майнер',
+        verbose_name=_('Miner'),
     )
 
     class Meta:
-        verbose_name = 'Запрос'
-        verbose_name_plural = 'Запросы'
+        verbose_name = _('Request')
+        verbose_name_plural = _('Requests')
         ordering = ['miner', 'name']
         unique_together = (('miner', 'slug'),)
 
@@ -154,7 +155,7 @@ class Server(models.Model):
     name = models.CharField(
         max_length=31,
         unique=True,
-        verbose_name='Имя',
+        verbose_name=_('Name'),
     )
     slug = models.SlugField(
         max_length=31,
@@ -163,19 +164,19 @@ class Server(models.Model):
         validators=[
             validate_slug,
         ],
-        help_text='URL идентификатор объекта',
+        help_text=_('A label for URL config.'),
     )
     host = models.GenericIPAddressField(
         validators=[
             validate_ipv46_address,
         ],
-        verbose_name='Адрес',
+        verbose_name=_('IP address'),
     )
     miner = models.ForeignKey(
         Miner,
         on_delete=models.CASCADE,
         related_name='servers',
-        verbose_name='Майнер',
+        verbose_name=_('Miner'),
     )
     port = models.PositiveIntegerField(
         default=1,
@@ -183,17 +184,17 @@ class Server(models.Model):
             MinValueValidator(0),
             MaxValueValidator(65535),
         ],
-        verbose_name='Порт',
+        verbose_name=_('Port'),
     )
     description = models.CharField(
         max_length=255,
         blank=True,
-        verbose_name='Описание',
+        verbose_name=_('Description'),
     )
 
     class Meta:
-        verbose_name = 'Сервер'
-        verbose_name_plural = 'Серверы'
+        verbose_name = _('Server')
+        verbose_name_plural = _('Servers')
         ordering = ['name']
 
     def __str__(self):

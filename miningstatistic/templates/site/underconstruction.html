@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}
-    {{ block.super }} - Раздел в разработке
+    {{ block.super }} - {% trans "Under construction" %}
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="offset-by-two eight columns">
-            <h1>Раздел в разработке</h1>
+            <h1>{% trans "Under construction" %}</h1>
             <p>
-                Этот раздел пока еще не готов.
+                {% trans "Sorry, this section is under construction." %}
             </p>
         </div>
     </div>

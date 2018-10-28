@@ -1,10 +1,12 @@
+from django.utils.translation import gettext_lazy as _
+
 import django_tables2 as tables
 
 
 class ServerStatisticTable(tables.Table):
     server = tables.Column(
         linkify=(('miner:server:detail', {'slug': tables.A('server')})),
-        verbose_name='Сервер',
+        verbose_name=_('Server'),
     )
 
     def __init__(self, *args, **kwargs):
@@ -32,7 +34,7 @@ class ServerStatisticTable(tables.Table):
                 'fans': 'Fans (rpm)',
                 'temps_1': 'Temps1 (°C)',
                 'temps_2': 'Temps2 (°C)',
-                'description': 'Описание',
+                'description': _('Description'),
             },
             'claymores-dual-ethereum-amd-gpu-98': {
                 'uptime': 'Uptime',
@@ -41,7 +43,7 @@ class ServerStatisticTable(tables.Table):
                 'dcr': 'DCR',
                 'dcr_per_gpu': 'DCR / GPU',
                 'gpu': 'GPU',
-                'pools': 'Пулы',
+                'pools': _('Pools'),
             },
             'ewbfs-cuda-zcash-034b': {
                 'gpu_status': 'GPU',
@@ -68,11 +70,11 @@ class ServerStatisticTable(tables.Table):
 
 class ServerStatisticErrorTable(ServerStatisticTable, tables.Table):
     error_type = tables.Column(
-        verbose_name='Тип ошибки',
+        verbose_name=_('Error type'),
     )
     error_data = tables.Column(
-        verbose_name='Данные',
+        verbose_name=_('Data'),
     )
     error_message = tables.Column(
-        verbose_name='Сообщение',
+        verbose_name=_('Message'),
     )

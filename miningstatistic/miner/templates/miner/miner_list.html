@@ -1,4 +1,5 @@
 {% extends "miner/base_miner.html" %}
+{% load i18n %}
 {% load names %}
 
 {% block title %}
@@ -6,7 +7,7 @@
 {% endblock %}
 
 {% block create_button %}
-    <a href="{% url 'miner:miner:create' %}" class="button button-primary">Добавить</a>
+    <a href="{% url 'miner:miner:create' %}" class="button button-primary">{% trans "Create" %}</a>
 {% endblock %}
 
 {% block miner_content %}
@@ -17,12 +18,18 @@
                 <li>
                     <a href="{{ miner.get_absolute_url }}">{{ miner }}</a>
                     <ul class=inline>
-                        <li><a href="{{ miner.get_update_url }}" class="button">Изменить</a></li>
-                        <li><a href="{{ miner.get_delete_url }}" class="button">Удалить</a></li>
+                        <li><a href="{{ miner.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                        <li><a href="{{ miner.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
                     </ul>
                 </li>
             {% empty %}
-                <li><em>{{ view.model|verbose_name_plural }} отсутствуют.</em></li>
+                <li>
+                    <em>
+                        {% blocktrans with model_name=view.model|verbose_name_plural %}
+                            No {{ model_name }} available
+                        {% endblocktrans %}
+                    </em>
+                </li>
             {% endfor %}
         </ul>
     </div>

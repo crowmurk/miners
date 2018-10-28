@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Загрузка заданий из БД Django - OK
-# Отправка запросов майнерам - OK
-# Загрузка результатов в БД - OK
-# TODO Отправка статистики Zabbix
-
 import datetime
 import django
 import json
@@ -40,8 +35,8 @@ class Worker():
             # Конфигурация должна существовать
             # и быть включена
             raise ValueError(
-                "Конфигурация с именем \"{config}\""
-                " не существует или выключена".format(
+                "Config \"{config}\" does not"
+                " exists or disabled".format(
                     config=config,
                 )
             )
@@ -56,8 +51,8 @@ class Worker():
         self.__server_tasks = ServerTask.objects.filter(enabled=True)
         if not self.__server_tasks:
             raise ValueError(
-                "Задания отсутсвуют, проверьте"
-                " настройки опроса майнеров"
+                "Tasks do not exists, check"
+                " miners request settings"
             )
 
     @property

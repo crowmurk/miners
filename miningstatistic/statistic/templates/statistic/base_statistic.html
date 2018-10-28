@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
     {% block statistic_content %}
@@ -9,17 +10,20 @@
             <div class="twelve columns">
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
-                        <li><a href="?page=1">&laquo; Первая</a></li>
-                        <li><a href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+                        <li><a href="?page=1">&laquo; {% trans "First" %}</a></li>
+                        <li><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
                     {% endif %}
-                    <li>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</li>
+                    <li>
+                        {% blocktrans with page=page_obj.number pages=page_obj.paginator.num_pages %}
+                            Page {{ page }} of {{ pages }}
+                        {% endblocktrans %}
+                    </li>
                     {% if page_obj.has_next %}
-                        <li><a href="?page={{ page_obj.next_page_number }}">Вперед</a></li>
-                        <li><a href="?page={{ paginator.num_pages }}">Последняя &raquo;</a></li>
+                        <li><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+                        <li><a href="?page={{ paginator.num_pages }}">{% trans "Last" %} &raquo;</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     {% endif %}
 {% endblock %}
-

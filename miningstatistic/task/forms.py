@@ -20,7 +20,7 @@ class ConfigForm(forms.ModelForm):
                 self.add_error(
                     'log_file',
                     forms.ValidationError(
-                        _("Не задан файл для ведения логов."),
+                        _("Log file is not specified"),
                         code='required',
                     ),
                 )
@@ -32,7 +32,7 @@ class ConfigForm(forms.ModelForm):
                 self.add_error(
                     'zabbix_server',
                     forms.ValidationError(
-                        _("Не задан адрес Zabbix сервера."),
+                        _("Zabbix server address is not specified"),
                         code='required',
                     ),
                 )
@@ -41,7 +41,7 @@ class ConfigForm(forms.ModelForm):
                 self.add_error(
                     'zabbix_port',
                     forms.ValidationError(
-                        _("Не задан порт Zabbix сервера."),
+                        _("Zabbix server port is not specified"),
                         code='required',
                     ),
                 )
@@ -50,7 +50,7 @@ class ConfigForm(forms.ModelForm):
                 self.add_error(
                     'zabbix_timeout',
                     forms.ValidationError(
-                        _("Не задан таймаут Zabbix сервера."),
+                        _("Timeout for Zabbix server is not specified"),
                         code='required',
                     ),
                 )
@@ -75,8 +75,8 @@ class ServerTaskForm(forms.ModelForm):
                 self.add_error(
                     'requests',
                     forms.ValidationError(
-                        _('Запрос %(request)s не поддерживаются майнером'
-                          ' %(miner)s на сервере %(server)s'),
+                        _('%(miner)s miner does not support %(request)s'
+                          ' request on %(server)s server'),
                         code='invalid',
                         params={
                             'server': server.name,

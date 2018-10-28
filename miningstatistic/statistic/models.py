@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 
 from task.models import ServerTask
 from core.validators import validate_json
@@ -23,39 +24,39 @@ class ServerStatistic(models.Model):
         ServerTask,
         on_delete=models.CASCADE,
         related_name='statistic',
-        verbose_name='Задание',
+        verbose_name=_('Task'),
     )
     request_id = models.IntegerField(
         validators=[
             MinValueValidator(1),
         ],
-        help_text='Идентификатор опроса',
+        help_text=_('Request ID'),
     )
     result = models.TextField(
         validators=[
             validate_json,
         ],
-        verbose_name='Результат опроса',
+        verbose_name=_('Request result'),
     )
     executed = models.DateTimeField(
-        verbose_name='Время выполнения',
+        verbose_name=_('Executed at'),
     )
     status = models.BooleanField(
-        verbose_name='Статус завершения',
+        verbose_name=_('Request status'),
     )
 
     objects = ServerStatisticQueryset.as_manager()
 
     class Meta:
-        verbose_name = 'Статистика сервера'
-        verbose_name_plural = 'Статистика серверов'
+        verbose_name = _('Server statistic')
+        verbose_name_plural = _('Servers statistics')
         ordering = ['-request_id', 'task', '-status']
 
     def __str__(self):
         return "{task} - {executed} - {status}".format(
             task=self.task,
             executed=self.executed,
-            status='Успех' if self.status else 'Ошибка',
+            status=_('Success') if self.status else _('Failure'),
         )
 
     def get_absolute_url(self):

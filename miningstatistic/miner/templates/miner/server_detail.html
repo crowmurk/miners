@@ -1,4 +1,5 @@
 {% extends "miner/base_miner.html" %}
+{% load i18n %}
 {% load names %}
 
 {% block title %}
@@ -11,8 +12,8 @@
             <div class="offset-by-two eight columns">
                 <h3>{{ server|verbose_name }}: {{ server.name }}</h3>
                 <ul class="inline">
-                    <li><a href="{{ server.get_update_url }}" class="button">Изменить</a></li>
-                    <li><a href="{{ server.get_delete_url }}" class="button">Удалить</a></li>
+                    <li><a href="{{ server.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ server.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
                 </ul>
                 <dl>
                     <dt><strong>{% field_verbose_name server 'host' %}:</strong></dt>

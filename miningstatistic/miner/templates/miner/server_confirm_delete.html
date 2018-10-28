@@ -1,9 +1,10 @@
 {% extends "miner/base_miner.html" %}
+{% load i18n %}
 {% load forms %}
 {% load names %}
 
 {% block title %}
-    {{ block.super }} - Удалить {{ server|verbose_name|lower }}
+    {{ block.super }} - {% trans "Delete" %} {{ server|verbose_name|lower }}
 {% endblock %}
 
 {% block content %}

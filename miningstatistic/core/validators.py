@@ -12,7 +12,7 @@ def validate_json(value):
             json.loads(value)
     except ValueError as e:
         raise ValidationError(
-            _('В шаблоне %(value)s найдена ошибка: %(message)s'),
+            _('An error was founded in %(value)s template: %(message)s'),
             code='invalid',
             params={'value': value, 'message': e, },
         )
@@ -24,7 +24,7 @@ def validate_slug(value):
     if value.lower() in ('create', 'update', 'delete'):
         # Будет совпадение с url представлений объекта
         raise ValidationError(
-            _('Slug объекта не может быть "%(slug)s"'),
+            _('Slug must not be "%(slug)s"'),
             code='invalid',
             params={'slug': value, },
         )

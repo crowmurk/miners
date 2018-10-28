@@ -1,4 +1,5 @@
 {% extends "miner/base_miner.html" %}
+{% load i18n %}
 {% load prettyfy %}
 {% load names %}
 
@@ -12,8 +13,8 @@
             <div class="offset-by-two eleven columns">
                 <h3>{{ request|verbose_name }}: {{ request.name }}</h3>
                 <ul class="inline">
-                    <li><a href="{{ request.get_update_url }}" class="button">Изменить</a></li>
-                    <li><a href="{{ request.get_delete_url }}" class="button">Удалить</a></li>
+                    <li><a href="{{ request.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ request.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
                 </ul>
                 <dl>
                     <dt><strong>{% field_verbose_name request 'miner' %}:</strong></dt>

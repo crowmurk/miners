@@ -1,16 +1,19 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}
-    Неверный запрос
+    {% trans "Bad request" %}
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="offset-by-two eight columns">
-            <h1>Неверный запрос</h1>
+            <h1>{% trans "Bad request" %}</h1>
             <p>
-                Я не огорчаюсь, если люди меня не понимают,
-                — огорчаюсь, если я не понимаю людей.
+                {% blocktrans %}
+                    I do not get upset when people do not understand me,
+                    upset if I do not understand people."
+                {% endblocktrans %}
             </p>
         </div>
     </div>

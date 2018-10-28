@@ -1,4 +1,5 @@
 {% extends "task/base_task.html" %}
+{% load i18n %}
 {% load names %}
 
 {% block title %}
@@ -11,18 +12,18 @@
             <div class="offset-by-two eight columns">
                 <h3>{{ config|verbose_name }}: {{ config.name }}</h3>
                 <ul class="inline">
-                    <li><a href="{{ config.get_update_url }}" class="button">Изменить</a></li>
-                    <li><a href="{{ config.get_delete_url }}" class="button">Удалить</a></li>
+                    <li><a href="{{ config.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ config.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
                 </ul>
                 <dl>
                     <dt><strong>{% field_verbose_name config 'enabled' %}:</strong></dt>
-                    <dd>{{ config.enabled|yesno:'Да,Нет' }}</dd>
+                    <dd>{{ config.enabled|yesno:_('Enabled,Disabled') }}</dd>
                     {% if config.description %}
                         <dt><strong>{% field_verbose_name config 'description' %}:</strong></dt>
                         <dd>{{ config.description }}</dd>
                     {% endif %}
                 </dl>
-                <h5>Основные настройки:</h5>
+                <h5>{% trans "Common settings" %}:</h5>
                 <dl>
                     <dt><strong>{% field_verbose_name config 'refresh' %}:</strong></dt>
                     <dd>{{ config.refresh }}</dd>
@@ -49,7 +50,7 @@
                         <dd>{{ config.zabbix_timeout }}</dd>
                     {% endif %}
                     <dt><strong>{% field_verbose_name config 'zabbix_send' %}:</strong></dt>
-                    <dd>{{ config.zabbix_send|yesno:'Да,Нет' }}</dd>
+                    <dd>{{ config.zabbix_send|yesno:_('Yes,No') }}</dd>
                 </dl>
             </div>
         </div>

@@ -3,6 +3,8 @@ import json
 from django.utils import timezone
 from django.views.generic.base import TemplateView
 
+from django.utils.translation import gettext_lazy as _
+
 from django_tables2 import MultiTableMixin, Column
 
 from task.models import Config
@@ -50,7 +52,7 @@ class ServerStatisticList(MultiTableMixin, TemplateView):
             if data:
                 table = ServerStatisticErrorTable(
                     get_data_list(data),
-                    verbose_name_prefix='Ошибки',
+                    verbose_name_prefix=_('Errors for'),
                     miner=miner,
                 )
                 tables.append(table)
@@ -67,7 +69,7 @@ class ServerStatisticList(MultiTableMixin, TemplateView):
                     extra_columns=[(name, Column())
                                    for name in data[0].keys()
                                    if name != 'server'],
-                    verbose_name_prefix='Статистика',
+                    verbose_name_prefix=_('Statistic for'),
                     miner=miner,
                 )
                 tables.append(table)

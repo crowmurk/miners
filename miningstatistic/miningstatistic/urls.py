@@ -29,6 +29,7 @@ urlpatterns = [
         template_name='site/underconstruction.html'),
         name='underconstruction'),
     path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n'))
 ]
 
 # Подключение django debug toolbar

@@ -1,4 +1,5 @@
 {% extends "statistic/base_statistic.html" %}
+{% load i18n %}
 {% load django_tables2 %}
 {% load names %}
 
@@ -21,11 +22,19 @@
             {% render_table table %}
         {% endif %}
     {% empty %}
-        <li><em>{{ view.model|verbose_name_plural }} отсутствует.</em></li>
+        <li>
+            <em>
+                {% blocktrans with model_name=view.model|verbose_name_plural %}
+                    No {{ model_name }} available
+                {% endblocktrans %}
+            </em>
+        </li>
     {% endfor %}
 {% endblock %}
 
 {% block footer %}
     {{ block.super }}
-    <p>Сейчас: {{ now }} - Интервал обновления: {{ update_interval }} сек.</p>
+    {% blocktrans with now_t=now update_interval_t=update_interval %}
+        <p>Now: {{ now_t }} - Update interval: {{ update_interval_t }} sec.</p>
+    {% endblocktrans %}
 {% endblock %}

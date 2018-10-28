@@ -1,15 +1,19 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}
-    Страница не найдена
+    {% trans "Page not found" %}
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="offset-by-two eight columns">
-            <h1>Страница не найдена</h1>
+            <h1>{% trans "Page not found" %}</h1>
             <p>
-                Ходят тут всякие, а потом у меня страницы пропадают!
+                {% blocktrans %}
+                    There are all sorts here walking around,
+                    and then I have a page missing!
+                {% endblocktrans %}
             </p>
         </div>
     </div>
