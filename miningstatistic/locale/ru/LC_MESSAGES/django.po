@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-28 07:20+0300\n"
+"POT-Creation-Date: 2018-11-03 08:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,7 +75,7 @@ msgstr "URL идентификатор объекта"
 msgid "Description"
 msgstr "Описание"
 
-#: miner/models.py:40 templates/base.html:55
+#: miner/models.py:40 templates/base.html:60
 msgid "Miners"
 msgstr "Майнеры"
 
@@ -111,7 +111,7 @@ msgstr "Порт"
 msgid "Server"
 msgstr "Сервер"
 
-#: miner/models.py:197 templates/base.html:54
+#: miner/models.py:197 templates/base.html:59
 msgid "Servers"
 msgstr "Серверы"
 
@@ -233,11 +233,11 @@ msgstr ""
 "                            %(model_name)s не существует\n"
 "                        "
 
-#: miningstatistic/settings/base.py:109
+#: miningstatistic/settings/base.py:112
 msgid "Russian"
 msgstr "Русский"
 
-#: miningstatistic/settings/base.py:110
+#: miningstatistic/settings/base.py:113
 msgid "English"
 msgstr "Английский"
 
@@ -277,7 +277,7 @@ msgstr "Успех"
 msgid "Failure"
 msgstr "Ошибка"
 
-#: statistic/tables.py:46 templates/base.html:56
+#: statistic/tables.py:46 templates/base.html:61
 msgid "Pools"
 msgstr "Пулы"
 
@@ -312,7 +312,8 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"        <p>Сейчас: %(now_t)s - Интервал обновения: %(update_interval_t)s сек.</p>\n"
+"        <p>Сейчас: %(now_t)s - Интервал обновения: %(update_interval_t)s сек."
+"</p>\n"
 "    "
 
 #: statistic/views.py:55
@@ -419,7 +420,8 @@ msgstr "Включено"
 msgid ""
 "Only one config can be enabled at a time. \"%(name)s\" config is now enabled."
 msgstr ""
-"Только одна конфигурация может быть включена. Сейчас включена конфигурация \"%(name)s\"."
+"Только одна конфигурация может быть включена. Сейчас включена конфигурация "
+"\"%(name)s\"."
 
 #: task/models.py:182
 msgid "Timeout"
@@ -511,7 +513,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Ходят тут всякие,,\n"
+"                    Ходят тут всякие,\n"
 "                    а потом у меня страницы пропадают!\n"
 "                "
 
@@ -523,25 +525,57 @@ msgstr "Ошибка сервера"
 msgid "Do not mistake the one who does nothing."
 msgstr "Никогда не ошибается тот, кто ничего не делает."
 
-#: templates/base.html:24
+#: templates/base.html:26
+msgid "LogOut"
+msgstr "Выйти"
+
+#: templates/base.html:28 templates/registration/login.html:37
 msgid "LogIn"
 msgstr "Войти"
 
-#: templates/base.html:52
+#: templates/base.html:57
 msgid "Statistic"
 msgstr "Статистика"
 
-#: templates/base.html:53
+#: templates/base.html:58
 msgid "Tasks"
 msgstr "Задачи"
 
-#: templates/base.html:57
+#: templates/base.html:62
 msgid "Config"
 msgstr "Конфигурация"
 
-#: templates/base.html:58
+#: templates/base.html:63
 msgid "Contact"
 msgstr "Контакт"
+
+#: templates/registration/logged_out.html:6
+msgid "Logged out!"
+msgstr "Выход выполнен!"
+
+#: templates/registration/logged_out.html:7
+msgid "Click here to login again."
+msgstr "Войти снова."
+
+#: templates/registration/login.html:8
+msgid ""
+"\n"
+"                    Your username and password didn't match.\n"
+"                    Please try again.\n"
+"                "
+msgstr ""
+"\n"
+"                    Имя пользователя и пароль не совпадают.\n"
+"                    Пожалуйста, попробуйте снова.\n"
+"                "
+
+#: templates/registration/login.html:18
+msgid "Your account doesn't have access to this page."
+msgstr "Ваш пользователь не имеет доступа к этой странице."
+
+#: templates/registration/login.html:21
+msgid "Please login to see this page."
+msgstr "Пожалуйста войдите чтобы увидеть страницу."
 
 #: templates/site/underconstruction.html:5
 #: templates/site/underconstruction.html:11
@@ -550,4 +584,4 @@ msgstr "В разработке"
 
 #: templates/site/underconstruction.html:13
 msgid "Sorry, this section is under construction."
-msgstr "Извините, раздел в разработке"
+msgstr "Извините, раздел в разработке."

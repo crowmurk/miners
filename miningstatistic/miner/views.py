@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView,
     CreateView,
@@ -26,7 +27,7 @@ class MinerList(ListView):
     paginate_by = 7
 
 
-class MinerCreate(CreateView):
+class MinerCreate(LoginRequiredMixin, CreateView):
     model = Miner
     form_class = MinerForm
 
@@ -36,17 +37,18 @@ class MinerDetail(DetailView):
     form_class = MinerForm
 
 
-class MinerUpdate(UpdateView):
+class MinerUpdate(LoginRequiredMixin, UpdateView):
     model = Miner
     form_class = MinerForm
 
 
-class MinerDelete(DeleteView):
+class MinerDelete(LoginRequiredMixin, DeleteView):
     model = Miner
     success_url = reverse_lazy('miner:miner:list')
 
 
 class RequestCreate(
+        LoginRequiredMixin,
         RequestGetObjectMixin,
         MinerContextMixin,
         CreateView,
@@ -79,6 +81,7 @@ class RequestDetail(
 
 
 class RequestUpdate(
+        LoginRequiredMixin,
         RequestGetObjectMixin,
         MinerContextMixin,
         UpdateView,
@@ -90,6 +93,7 @@ class RequestUpdate(
 
 
 class RequestDelete(
+        LoginRequiredMixin,
         RequestGetObjectMixin,
         MinerContextMixin,
         DeleteView,
@@ -107,7 +111,7 @@ class ServerList(ListView):
     paginate_by = 7
 
 
-class ServerCreate(CreateView):
+class ServerCreate(LoginRequiredMixin, CreateView):
     model = Server
     form_class = ServerForm
 
@@ -117,11 +121,11 @@ class ServerDetail(DetailView):
     form_class = ServerForm
 
 
-class ServerUpdate(UpdateView):
+class ServerUpdate(LoginRequiredMixin, UpdateView):
     model = Server
     form_class = ServerForm
 
 
-class ServerDelete(DeleteView):
+class ServerDelete(LoginRequiredMixin, DeleteView):
     model = Server
     success_url = reverse_lazy('miner:server:list')

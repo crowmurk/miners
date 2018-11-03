@@ -21,7 +21,12 @@
             <div class="status row">
                 <div class="offset-by-eight four columns">
                     <ul class="inline">
-                        <li><a href="{% url 'underconstruction' %}">{% trans "LogIn" %}</a></li>
+                        {% if user.is_authenticated %}
+                            <li>{{ user.get_username }}</li>
+                            <li><a href="{% url 'logout' %}">{% trans "LogOut" %}</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">{% trans "LogIn" %}</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

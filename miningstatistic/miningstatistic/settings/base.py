@@ -101,6 +101,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Login
+LOGIN_REDIRECT_URL = '/'
+
 # Internationalization
 
 LANGUAGE_CODE = 'ru-ru'

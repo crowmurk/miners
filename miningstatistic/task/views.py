@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView,
     CreateView,
@@ -17,7 +18,7 @@ class ConfigList(ListView):
     paginate_by = 7
 
 
-class ConfigCreate(CreateView):
+class ConfigCreate(LoginRequiredMixin, CreateView):
     model = Config
     form_class = ConfigForm
 
@@ -27,12 +28,12 @@ class ConfigDetail(DetailView):
     form_class = ConfigForm
 
 
-class ConfigUpdate(UpdateView):
+class ConfigUpdate(LoginRequiredMixin, UpdateView):
     model = Config
     form_class = ConfigForm
 
 
-class ConfigDelete(DeleteView):
+class ConfigDelete(LoginRequiredMixin, DeleteView):
     model = Config
     success_url = reverse_lazy('task:config:list')
 
@@ -42,7 +43,7 @@ class ServerTaskList(ListView):
     paginate_by = 7
 
 
-class ServerTaskCreate(CreateView):
+class ServerTaskCreate(LoginRequiredMixin, CreateView):
     model = ServerTask
     form_class = ServerTaskForm
 
@@ -52,11 +53,11 @@ class ServerTaskDetail(DetailView):
     form_class = ServerTaskForm
 
 
-class ServerTaskUpdate(UpdateView):
+class ServerTaskUpdate(LoginRequiredMixin, UpdateView):
     model = ServerTask
     form_class = ServerTaskForm
 
 
-class ServerTaskDelete(DeleteView):
+class ServerTaskDelete(LoginRequiredMixin, DeleteView):
     model = ServerTask
     success_url = reverse_lazy('task:server:list')
