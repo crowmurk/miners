@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 - [Запуск тестового сервера](#запуск-тестового-сервера)
 - [Run a test server](#run-a-test-server)
-=======
-[Запуск тестового сервера](#запуск-тестового-сервера)
-[Run a test server](#run-a-test-server)
->>>>>>> f8bb1dc28924a6f3987136a1f41df7cc2fda8c94
 
 # Run a test server
 
