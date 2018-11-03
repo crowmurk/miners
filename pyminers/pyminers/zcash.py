@@ -24,7 +24,11 @@ class ZCash(Miner):
 
         # Поддерживаемые запросы
         self.__requests = {
-            'Statistic': b'{"id":0, "method":"getstat"}\n',
+            'Statistic':
+            {
+                "id": 0,
+                "method": "getstat",
+            },
         }
 
         # Поля ответа и их тип и размер
@@ -66,20 +70,70 @@ class ZCash(Miner):
         self.host = host
         self.port = port
         self.timeout = timeout
-
-        # Запрос к серверу, должен соответсвовать API
-        if request in self.__requests:
-            self.request = self.__requests[request]
-            self.__template = self.__templates[request]
-        else:
-            raise ValueError(
-                "request = '{request}' request not supported"
-                "by this miner".format(request=request))
+        self.request = request
 
     @property
     def requests(self):
         """Поддерживаемые запросы"""
         return self.__requests.keys()
+
+    @property
+    def request(self):
+        """Запрос к серверу в формате dict
+        """
+        return super().request
+
+    @request.setter
+    def request(self, value):
+        """Запрос к серверу, должен соответсвовать API
+        """
+        if isinstance(value, (str, bytes, bytearray)):
+            if value in self.__requests:
+                # Передано допустимое имя запроса
+                super(self.__class__, self.__class__).request.fset(
+                    self, bytes(
+                        json.dumps(self.__requests[value]),
+                        encoding='utf-8') + b'\n')
+                # Определяем шаблон для проверки ответа
+                self.__template = self.__templates[value]
+                return None
+            else:
+                # Прередан запрос в виде строки
+                # или недопустимое имя запроса
+
+                # Запрос к майнеру должен заканчиваться '\n'
+                end = '\n' if isinstance(value, str) else b'\n'
+                if not value.endswith(end):
+                    raise ValueError(
+                        "request = '{request}' request not supported"
+                        " by this miner".format(request=value)) from None
+
+                try:
+                    value = json.loads(value)
+                except ValueError:
+                    # Ошибка в формате запроса,
+                    # или недопустимое имя запроса
+                    raise ValueError(
+                        "request = '{request}' request not supported"
+                        " by this miner".format(request=value)) from None
+
+        if value in self.__requests.values():
+            # Передан допустимый запрос
+            super(self.__class__, self.__class__).request.fset(
+                self, bytes(
+                    json.dumps(value),
+                    encoding='utf-8') + b'\n')
+            # Получаем имя запроса
+            value = next(
+                (name for name, request in self.__requests.items()
+                 if request == value),
+            )
+            # Определяем шаблон для проверки ответа
+            self.__template = self.__templates[value]
+        else:
+            raise ValueError(
+                "request = '{request}' request not supported"
+                " by this miner".format(request=value))
 
     @property
     def response(self):

@@ -629,7 +629,7 @@ class Zabbix():
             formatter = logging.Formatter()
         elif value == 'journal':
             # Запись лога в системный журнал
-            handler = journal.JournalHandler(SYSLOG_IDENTIFIER=journalName)
+            handler = journal.JournaldLogHandler(identifier=journalName)
             formatter = logging.Formatter('%(levelname)s: %(message)s')
         elif value == 'stdout':
             # Вывод лога в stdout

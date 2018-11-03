@@ -126,10 +126,28 @@ class Miner():
 
     @request.setter
     def request(self, value):
-        """Запрос к майнеру, должен быть в формате json"""
+        """Запрос к майнеру, должен быть
+        строкой bytes в формате json
+        """
         try:
-            json.loads(value)
-            self.__request = value
+            if isinstance(value, bytes):
+                json.loads(value)
+                self.__request = value
+            elif isinstance(value, bytearray):
+                json.loads(value)
+                self.__request = bytes(value)
+            elif isinstance(value, str):
+                json.loads(value)
+                self.__request = bytes(
+                    value,
+                    encoding='utf-8',
+                )
+            else:
+                value_dump = json.dumps(value)
+                self.__request = bytes(
+                    value_dump,
+                    encoding='utf-8',
+                )
             self.__error = False
         except ValueError as e:
             raise ValueError(
@@ -148,10 +166,28 @@ class Miner():
 
     @response.setter
     def response(self, value):
-        """Ответ от майнера, должен быть в формате json"""
+        """Ответ от майнера, должен быть
+        строкой bytes в формате json
+        """
         try:
-            json.loads(value)
-            self.__response = value
+            if isinstance(value, bytes):
+                json.loads(value)
+                self.__response = value
+            elif isinstance(value, bytearray):
+                json.loads(value)
+                self.__response = bytes(value)
+            elif isinstance(value, str):
+                json.loads(value)
+                self.__response = bytes(
+                    value,
+                    encoding='utf-8',
+                )
+            else:
+                value_dump = json.dumps(value)
+                self.__response = bytes(
+                    value_dump,
+                    encoding='utf-8',
+                )
             self.__error = False
         except ValueError as e:
             self.errorResponse(e, value)
@@ -166,7 +202,7 @@ class Miner():
             {
                 "error_type": type(error).__name__,
                 "error_data": str(value),
-                "error_message:": str(error),
+                "error_message": str(error),
             },
         )
 

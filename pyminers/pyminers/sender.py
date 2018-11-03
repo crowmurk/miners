@@ -2,6 +2,8 @@
 
 """Модуль содержит реализацию класса Sender"""
 
+import datetime
+
 from copy import deepcopy
 import queue as Queue
 import threading
@@ -12,6 +14,7 @@ from .zcash import ZCash
 from .etherium import Etherium
 from .monero import Monero
 from .cgminer import CGMiner
+from .miner import Miner
 
 
 class Sender():
@@ -38,6 +41,7 @@ class Sender():
             'ZCash': ZCash,
             'Monero': Monero,
             'CGMiner': CGMiner,
+            'Miner': Miner,
         }
 
         # Шаблон для проверки параметров опроса майнера
@@ -175,6 +179,7 @@ class Sender():
                 exchange = {
                     'Request': miner.request,
                     'Response': miner.response,
+                    'When': datetime.datetime.now(),
                     'Error': miner.error,
                 }
                 if name not in self.__results:
