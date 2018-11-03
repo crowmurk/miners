@@ -1,5 +1,5 @@
-[Запуск тестового сервера](#запуск-тестового-сервера)
-[Run a test server](#run-a-test-server)
+- [Запуск тестового сервера](#запуск-тестового-сервера)
+- [Run a test server](#run-a-test-server)
 
 # Run a test server
 
