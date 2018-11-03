@@ -1,0 +1,73 @@
+{% extends "miner/base_miner.html" %}
+{% load i18n %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} – {{ miner|verbose_name }}: {{ miner }}
+{% endblock %}
+
+{% block content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eight columns">
+                <h3>{{ miner|verbose_name }}: {{ miner.name }}</h3>
+                <ul class="inline">
+                    <li><a href="{{ miner.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ miner.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>{% field_verbose_name miner 'version' %}:</strong></dt>
+                    <dd>{{ miner.version }}</dd>
+                    {% if miner.description %}
+                        <dt><strong>{% field_verbose_name miner 'description' %}:</strong></dt>
+                        <dd>{{ miner.description }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        <div class="row">
+            <section class="meta offset-by-two one-third column">
+                {% field_verbose_name miner 'requests' as requests_verbose_name %}
+                <h5>{%trans "Supported"%} {{ requests_verbose_name|lower }}</h5>
+                <ul>
+                    {% for request in miner.requests.all %}
+                        <li><a href="{{ request.get_absolute_url }}">{{ request.name }}</a>
+                            <ul class="inline">
+                                <li><a href="{{ request.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                                <li><a href="{{ request.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                            </ul>
+                        </li>
+                    {% empty %}
+                        <li>
+                            <em>
+                                {% field_verbose_name miner 'requests' as model_name  %}
+                                {% blocktrans %}
+                                    No {{ model_name }} available
+                                {% endblocktrans %}
+                            </em>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% field_verbose_name miner 'servers' as servers_verbose_name %}
+                <h5>{% trans "Installed on" %} {{ servers_verbose_name|lower }}</h5>
+                <ul>
+                    {% for server in miner.servers.all %}
+                        <li><a href="{{ server.get_absolute_url }}">{{ server.name }}</a> - {{ server.host }}:{{ server.port }}</li>
+                    {% empty %}
+                        <li>
+                            <em>
+                                {% field_verbose_name miner 'servers' as model_name  %}
+                                {% blocktrans %}
+                                    No {{ model_name }} available
+                                {% endblocktrans %}
+                            </em>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <section class="meta offset-by-two one-third column">
+                <p><a href="{{ miner.get_request_create_url }}" class="button">{% trans "Create" %}</a></p>
+            </section>
+        </div>
+    </article>
+{% endblock %}

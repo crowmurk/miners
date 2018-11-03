@@ -1,0 +1,36 @@
+{% extends "miner/base_miner.html" %}
+{% load i18n %}
+{% load prettyfy %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} – {{ request|verbose_name }}: {{ request.name }} ({{ request.miner }})
+{% endblock %}
+
+{% block miner_content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eleven columns">
+                <h3>{{ request|verbose_name }}: {{ request.name }}</h3>
+                <ul class="inline">
+                    <li><a href="{{ request.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ request.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>{% field_verbose_name request 'miner' %}:</strong></dt>
+                    <dd><a href="{{ request.miner.get_absolute_url }}">{{ request.miner }}</a></dd>
+                    {% if request.description %}
+                        <dt><strong>{% field_verbose_name request 'description' %}:</strong></dt>
+                        <dd>{{ request.description }}</dd>
+                    {% endif %}
+                    <dt><strong>{% field_verbose_name request 'request' %}:</strong></dt>
+                    <dd><pre><code>{{ request.request|pretty_json }}</code></pre></dd>
+                    {% if request.response %}
+                        <dt><strong>{% field_verbose_name request 'response' %}:</strong></dt>
+                        <dd><pre><code>{{ request.response|pretty_json }}</code></pre></dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </article>
+{% endblock %}

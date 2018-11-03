@@ -1,0 +1,27 @@
+{% extends "task/base_task.html" %}
+{% load i18n %}
+{% load forms %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }}
+    {% if servertask %}
+        - {% trans "Edit" %}
+    {% else %}
+        - {% trans "Create" %}
+    {% endif %}
+    {{ view.model|verbose_name|lower }}
+{% endblock %}
+
+{% block content %}
+    {% if servertask %}
+        {% trans "Edit" as action_verbose %}
+        {% form servertask.get_update_url action_verbose %}
+    {% else %}
+        {% trans "Create" as action_verbose %}
+        {% url 'task:server:create' as form_url %}
+        {% form form_url action_verbose %}
+    {% endif %}
+{% endblock %}
+
+

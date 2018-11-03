@@ -1,0 +1,12 @@
+{% extends "miner/base_miner.html" %}
+{% load i18n %}
+{% load forms %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} - {% trans "Delete" %} {{ request|verbose_name|lower }}
+{% endblock %}
+
+{% block content %}
+    {% delete_form request.get_delete_url %}
+{% endblock %}

@@ -1,0 +1,10 @@
+<div class="row">
+    <div class="offset-by-two eight columns">
+        <h2>{{ action_verbose }}</h2>
+        <form action="{{ action }}" method="{{ method|default:'post' }}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button-primary" type="submit">{{ action_verbose|default:'Submit' }}</button>
+        </form>
+    </div>
+</div>

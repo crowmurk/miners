@@ -1,0 +1,25 @@
+{% extends "miner/base_miner.html" %}
+{% load i18n %}
+{% load forms %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }}
+    {% if server %}
+        - {% trans "Edit" %}
+    {% else %}
+        - {% trans "Create" %}
+    {% endif %}
+    {{ view.model|verbose_name|lower }}
+{% endblock %}
+
+{% block content %}
+    {% if server %}
+        {% trans "Edit" as action_verbose %}
+        {% form server.get_update_url action_verbose %}
+    {% else %}
+        {% trans "Create" as action_verbose %}
+        {% url 'miner:server:create' as form_url %}
+        {% form form_url action_verbose %}
+    {% endif %}
+{% endblock %}

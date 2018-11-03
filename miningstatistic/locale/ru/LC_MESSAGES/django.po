@@ -1,0 +1,587 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-03 08:57+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: core/templates/core/includes/confirm_delete_form.html:6
+msgid "Are you sure you want to delete"
+msgstr "Вы уверены что хотите удалить"
+
+#: core/templates/core/includes/confirm_delete_form.html:7
+msgid "Cancel"
+msgstr "Отмена"
+
+#: core/templates/core/includes/confirm_delete_form.html:8
+#: miner/templates/miner/miner_confirm_delete.html:7
+#: miner/templates/miner/miner_detail.html:16
+#: miner/templates/miner/miner_detail.html:37
+#: miner/templates/miner/miner_list.html:22
+#: miner/templates/miner/request_confirm_delete.html:7
+#: miner/templates/miner/request_detail.html:17
+#: miner/templates/miner/server_confirm_delete.html:7
+#: miner/templates/miner/server_detail.html:16
+#: miner/templates/miner/server_list.html:22
+#: task/templates/task/config_confirm_delete.html:7
+#: task/templates/task/config_detail.html:16
+#: task/templates/task/config_list.html:24
+#: task/templates/task/servertask_confirm_delete.html:7
+#: task/templates/task/servertask_detail.html:16
+#: task/templates/task/servertask_list.html:33
+msgid "Delete"
+msgstr "Удалить"
+
+#: core/validators.py:15
+#, python-format
+msgid "An error was founded in %(value)s template: %(message)s"
+msgstr "Шаблон %(value)s содержит ошибку: %(message)s"
+
+#: core/validators.py:27
+#, python-format
+msgid "Slug must not be \"%(slug)s\""
+msgstr "Slug не может быть \"%(slug)s\""
+
+#: miner/models.py:17 miner/models.py:39 miner/models.py:111
+#: miner/models.py:179
+msgid "Miner"
+msgstr "Майнер"
+
+#: miner/models.py:21
+msgid "Version"
+msgstr "Версия"
+
+#: miner/models.py:30 miner/models.py:85 miner/models.py:167 task/models.py:43
+msgid "A label for URL config."
+msgstr "URL идентификатор объекта"
+
+#: miner/models.py:35 miner/models.py:105 miner/models.py:192
+#: statistic/tables.py:37 task/models.py:107
+msgid "Description"
+msgstr "Описание"
+
+#: miner/models.py:40 templates/base.html:60
+msgid "Miners"
+msgstr "Майнеры"
+
+#: miner/models.py:77 miner/models.py:158 task/models.py:34
+msgid "Name"
+msgstr "Имя"
+
+#: miner/models.py:92 miner/models.py:115
+msgid "Request"
+msgstr "Запрос"
+
+#: miner/models.py:99
+msgid "Response"
+msgstr "Ответ"
+
+#: miner/models.py:100
+msgid "Response template"
+msgstr "Щаблон ответа"
+
+#: miner/models.py:116 task/models.py:174
+msgid "Requests"
+msgstr "Запросы"
+
+#: miner/models.py:173
+msgid "IP address"
+msgstr "IP адрес"
+
+#: miner/models.py:187
+msgid "Port"
+msgstr "Порт"
+
+#: miner/models.py:196 statistic/tables.py:9 task/models.py:169
+msgid "Server"
+msgstr "Сервер"
+
+#: miner/models.py:197 templates/base.html:59
+msgid "Servers"
+msgstr "Серверы"
+
+#: miner/templates/miner/base_miner.html:19
+#: pool/templates/pool/base_miner.html:19
+#: statistic/templates/statistic/base_statistic.html:13
+#: task/templates/task/base_task.html:19
+msgid "First"
+msgstr "Первая"
+
+#: miner/templates/miner/base_miner.html:20
+#: pool/templates/pool/base_miner.html:20
+#: statistic/templates/statistic/base_statistic.html:14
+#: task/templates/task/base_task.html:20
+msgid "Previous"
+msgstr "Предыдущая"
+
+#: miner/templates/miner/base_miner.html:23
+#: pool/templates/pool/base_miner.html:23
+#: statistic/templates/statistic/base_statistic.html:17
+#: task/templates/task/base_task.html:23
+#, python-format
+msgid ""
+"\n"
+"                            Page %(page)s of %(pages)s\n"
+"                        "
+msgstr ""
+"\n"
+"                            Страница %(page)s из %(pages)s\n"
+"                        "
+
+#: miner/templates/miner/base_miner.html:28
+#: pool/templates/pool/base_miner.html:28
+#: statistic/templates/statistic/base_statistic.html:22
+#: task/templates/task/base_task.html:28
+msgid "Next"
+msgstr "Следующая"
+
+#: miner/templates/miner/base_miner.html:29
+#: pool/templates/pool/base_miner.html:29
+#: statistic/templates/statistic/base_statistic.html:23
+#: task/templates/task/base_task.html:29
+msgid "Last"
+msgstr "Последняя"
+
+#: miner/templates/miner/miner_detail.html:15
+#: miner/templates/miner/miner_detail.html:36
+#: miner/templates/miner/miner_form.html:9
+#: miner/templates/miner/miner_form.html:18
+#: miner/templates/miner/miner_list.html:21
+#: miner/templates/miner/request_detail.html:16
+#: miner/templates/miner/request_form.html:9
+#: miner/templates/miner/request_form.html:18
+#: miner/templates/miner/server_detail.html:15
+#: miner/templates/miner/server_form.html:9
+#: miner/templates/miner/server_form.html:18
+#: miner/templates/miner/server_list.html:21
+#: task/templates/task/config_detail.html:15
+#: task/templates/task/config_form.html:9
+#: task/templates/task/config_form.html:18
+#: task/templates/task/config_list.html:23
+#: task/templates/task/servertask_detail.html:15
+#: task/templates/task/servertask_form.html:9
+#: task/templates/task/servertask_form.html:18
+#: task/templates/task/servertask_list.html:32
+msgid "Edit"
+msgstr "Изменить"
+
+#: miner/templates/miner/miner_detail.html:31
+msgid "Supported"
+msgstr "Поддерживаемые"
+
+#: miner/templates/miner/miner_detail.html:44
+#: miner/templates/miner/miner_detail.html:60
+#: task/templates/task/servertask_detail.html:43
+#, python-format
+msgid ""
+"\n"
+"                                    No %(model_name)s available\n"
+"                                "
+msgstr ""
+"\n"
+"                                    %(model_name)s не существует\n"
+"                                "
+
+#: miner/templates/miner/miner_detail.html:52
+msgid "Installed on"
+msgstr "Установлен на"
+
+#: miner/templates/miner/miner_detail.html:69
+#: miner/templates/miner/miner_form.html:11
+#: miner/templates/miner/miner_form.html:21
+#: miner/templates/miner/miner_list.html:10
+#: miner/templates/miner/request_form.html:11
+#: miner/templates/miner/request_form.html:21
+#: miner/templates/miner/server_form.html:11
+#: miner/templates/miner/server_form.html:21
+#: miner/templates/miner/server_list.html:10
+#: task/templates/task/config_form.html:11
+#: task/templates/task/config_form.html:21
+#: task/templates/task/config_list.html:10
+#: task/templates/task/servertask_form.html:11
+#: task/templates/task/servertask_form.html:21
+#: task/templates/task/servertask_list.html:10
+msgid "Create"
+msgstr "Создать"
+
+#: miner/templates/miner/miner_list.html:28
+#: miner/templates/miner/server_list.html:28
+#: task/templates/task/config_list.html:30
+#: task/templates/task/servertask_list.html:39
+#, python-format
+msgid ""
+"\n"
+"                            No %(model_name)s available\n"
+"                        "
+msgstr ""
+"\n"
+"                            %(model_name)s не существует\n"
+"                        "
+
+#: miningstatistic/settings/base.py:112
+msgid "Russian"
+msgstr "Русский"
+
+#: miningstatistic/settings/base.py:113
+msgid "English"
+msgstr "Английский"
+
+#: statistic/models.py:27
+msgid "Task"
+msgstr "Задача"
+
+#: statistic/models.py:33
+msgid "Request ID"
+msgstr "ID Запроса"
+
+#: statistic/models.py:39
+msgid "Request result"
+msgstr "Результат запроса"
+
+#: statistic/models.py:42
+msgid "Executed at"
+msgstr "Выполнен в"
+
+#: statistic/models.py:45
+msgid "Request status"
+msgstr "Статус запроса"
+
+#: statistic/models.py:51
+msgid "Server statistic"
+msgstr "Статистика сервера"
+
+#: statistic/models.py:52
+msgid "Servers statistics"
+msgstr "Статистика серверов"
+
+#: statistic/models.py:59
+msgid "Success"
+msgstr "Успех"
+
+#: statistic/models.py:59
+msgid "Failure"
+msgstr "Ошибка"
+
+#: statistic/tables.py:46 templates/base.html:61
+msgid "Pools"
+msgstr "Пулы"
+
+#: statistic/tables.py:73
+msgid "Error type"
+msgstr "Тип ошибки"
+
+#: statistic/tables.py:76
+msgid "Data"
+msgstr "Данные"
+
+#: statistic/tables.py:79
+msgid "Message"
+msgstr "Сообщение"
+
+#: statistic/templates/statistic/serverstatistic_list.html:27
+#, python-format
+msgid ""
+"\n"
+"                    No %(model_name)s available\n"
+"                "
+msgstr ""
+"\n"
+"                    %(model_name)s не существует\n"
+"                "
+
+#: statistic/templates/statistic/serverstatistic_list.html:37
+#, python-format
+msgid ""
+"\n"
+"        <p>Now: %(now_t)s - Update interval: %(update_interval_t)s sec.</p>\n"
+"    "
+msgstr ""
+"\n"
+"        <p>Сейчас: %(now_t)s - Интервал обновения: %(update_interval_t)s сек."
+"</p>\n"
+"    "
+
+#: statistic/views.py:55
+msgid "Errors for"
+msgstr "Ошибки для"
+
+#: statistic/views.py:72
+msgid "Statistic for"
+msgstr "Статистика для"
+
+#: task/forms.py:23
+msgid "Log file is not specified"
+msgstr "Файл лога не указан"
+
+#: task/forms.py:35
+msgid "Zabbix server address is not specified"
+msgstr "Адрес Zabbix сервера не указан"
+
+#: task/forms.py:44
+msgid "Zabbix server port is not specified"
+msgstr "Порт Zabbix сервера не указан"
+
+#: task/forms.py:53
+msgid "Timeout for Zabbix server is not specified"
+msgstr "Таймаут Zabbix сервера не указан"
+
+#: task/forms.py:78
+#, python-format
+msgid ""
+"%(miner)s miner does not support %(request)s request on %(server)s server"
+msgstr ""
+"Майнер %(miner)s  на сервере %(server)s не поддерживает запрос %(request)s"
+
+#: task/models.py:25 task/models.py:118 task/models.py:209
+msgid "Disabled"
+msgstr "Выключено"
+
+#: task/models.py:26
+msgid "Systemd journal"
+msgstr "Журнал systemd"
+
+#: task/models.py:27
+msgid "STDOUT"
+msgstr "Стандартный вывод"
+
+#: task/models.py:28
+msgid "File"
+msgstr "Файл"
+
+#: task/models.py:47 task/models.py:186
+msgid "Status"
+msgstr "Статус"
+
+#: task/models.py:54
+msgid "Request interval"
+msgstr "Интервал запросов"
+
+#: task/models.py:55
+msgid "Request interval (sec.)."
+msgstr "Интервал запросов (сек.)"
+
+#: task/models.py:63
+msgid "Zabbix host"
+msgstr "Адрес Zabbix"
+
+#: task/models.py:72
+msgid "Zabbix port"
+msgstr "Порт Zabbix"
+
+#: task/models.py:81
+msgid "Zabbix timeout"
+msgstr "Таймаут Zabbix"
+
+#: task/models.py:85
+msgid "Send statistic to Zabbix"
+msgstr "Отправлять статистику Zabbix"
+
+#: task/models.py:91
+msgid "Log"
+msgstr "Лог"
+
+#: task/models.py:99
+msgid "Path to the file must follow POSIX"
+msgstr "Путь к файлу должен соответствовать POSIX"
+
+#: task/models.py:102
+msgid "Log file"
+msgstr "Файл лога"
+
+#: task/models.py:111
+msgid "Configuration"
+msgstr "Конфигурация"
+
+#: task/models.py:112
+msgid "Configurations"
+msgstr "Конфигурации"
+
+#: task/models.py:118 task/models.py:209
+msgid "Enabled"
+msgstr "Включено"
+
+#: task/models.py:151
+#, python-format
+msgid ""
+"Only one config can be enabled at a time. \"%(name)s\" config is now enabled."
+msgstr ""
+"Только одна конфигурация может быть включена. Сейчас включена конфигурация "
+"\"%(name)s\"."
+
+#: task/models.py:182
+msgid "Timeout"
+msgstr "Таймаут"
+
+#: task/models.py:190
+msgid "Last executed"
+msgstr "Последний запуск"
+
+#: task/models.py:194
+msgid "Last status"
+msgstr "Статус последнего запуска"
+
+#: task/models.py:198
+msgid "Server request"
+msgstr "Запрос к серверу"
+
+#: task/models.py:199
+msgid "Servers requests"
+msgstr "Запросы к серверам"
+
+#: task/templates/task/config_detail.html:20
+#: task/templates/task/servertask_detail.html:20
+msgid "Enabled,Disabled"
+msgstr "Включено,Выключено"
+
+#: task/templates/task/config_detail.html:26
+msgid "Common settings"
+msgstr "Общие настройки"
+
+#: task/templates/task/config_detail.html:53
+msgid "Yes,No"
+msgstr "Да,Нет"
+
+#: task/templates/task/config_list.html:20
+#: task/templates/task/servertask_list.html:26
+msgid "<strong>Enabled</strong>,Disabled"
+msgstr "<strong>Включено</strong>,Выключено"
+
+#: task/templates/task/servertask_detail.html:25
+msgid "Never"
+msgstr "Никогда"
+
+#: task/templates/task/servertask_detail.html:28
+msgid "Success,Failure,Unknown"
+msgstr "Успех,Ошибка,Неизвестно"
+
+#: task/templates/task/servertask_detail.html:30
+msgid "Settings"
+msgstr "Настройки"
+
+#: task/templates/task/servertask_list.html:30
+msgid "Success,<strong>Failure</strong>,Unknown"
+msgstr "Успех,<strong>Ошибка</strong>,Неизвестно"
+
+#: templates/400.html:5 templates/400.html:11
+msgid "Bad request"
+msgstr "Ошибка в запросе"
+
+#: templates/400.html:13
+msgid ""
+"\n"
+"                    I do not get upset when people do not understand me,\n"
+"                    upset if I do not understand people.\"\n"
+"                "
+msgstr ""
+"\n"
+"                    Я не огорчаюсь, если люди меня не понимают,\n"
+"                    - огорчаюсь, если я не понимаю людей.\"\n"
+"                "
+
+#: templates/403.html:5 templates/403.html:11
+msgid "Forbidden"
+msgstr "Доступ запрещен"
+
+#: templates/403.html:13
+msgid "No things are forbidden, they are just not recommended."
+msgstr "Запретных вещей нет, есть вещи нерекомендованные."
+
+#: templates/404.html:5 templates/404.html:11
+msgid "Page not found"
+msgstr "Страница не найдена"
+
+#: templates/404.html:13
+msgid ""
+"\n"
+"                    There are all sorts here walking around,\n"
+"                    and then I have a page missing!\n"
+"                "
+msgstr ""
+"\n"
+"                    Ходят тут всякие,\n"
+"                    а потом у меня страницы пропадают!\n"
+"                "
+
+#: templates/500.html:5 templates/500.html:11
+msgid "Internal server error"
+msgstr "Ошибка сервера"
+
+#: templates/500.html:13
+msgid "Do not mistake the one who does nothing."
+msgstr "Никогда не ошибается тот, кто ничего не делает."
+
+#: templates/base.html:26
+msgid "LogOut"
+msgstr "Выйти"
+
+#: templates/base.html:28 templates/registration/login.html:37
+msgid "LogIn"
+msgstr "Войти"
+
+#: templates/base.html:57
+msgid "Statistic"
+msgstr "Статистика"
+
+#: templates/base.html:58
+msgid "Tasks"
+msgstr "Задачи"
+
+#: templates/base.html:62
+msgid "Config"
+msgstr "Конфигурация"
+
+#: templates/base.html:63
+msgid "Contact"
+msgstr "Контакт"
+
+#: templates/registration/logged_out.html:6
+msgid "Logged out!"
+msgstr "Выход выполнен!"
+
+#: templates/registration/logged_out.html:7
+msgid "Click here to login again."
+msgstr "Войти снова."
+
+#: templates/registration/login.html:8
+msgid ""
+"\n"
+"                    Your username and password didn't match.\n"
+"                    Please try again.\n"
+"                "
+msgstr ""
+"\n"
+"                    Имя пользователя и пароль не совпадают.\n"
+"                    Пожалуйста, попробуйте снова.\n"
+"                "
+
+#: templates/registration/login.html:18
+msgid "Your account doesn't have access to this page."
+msgstr "Ваш пользователь не имеет доступа к этой странице."
+
+#: templates/registration/login.html:21
+msgid "Please login to see this page."
+msgstr "Пожалуйста войдите чтобы увидеть страницу."
+
+#: templates/site/underconstruction.html:5
+#: templates/site/underconstruction.html:11
+msgid "Under construction"
+msgstr "В разработке"
+
+#: templates/site/underconstruction.html:13
+msgid "Sorry, this section is under construction."
+msgstr "Извините, раздел в разработке."

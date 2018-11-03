@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="row">
+        <section class="eight columns">
+            {% block pool_content %}
+            {% endblock %}
+        </section>
+        <section class="four columns">
+            {% block create_button %}{% endblock %}
+        </section>
+    </div>
+    {% if is_paginated %}
+        <div class="row">
+            <div class="twelve columns">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page=1">&laquo; {% trans "First" %}</a></li>
+                        <li><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+                    {% endif %}
+                    <li>
+                        {% blocktrans with page=page_obj.number pages=page_obj.paginator.num_pages %}
+                            Page {{ page }} of {{ pages }}
+                        {% endblocktrans %}
+                    </li>
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+                        <li><a href="?page={{ paginator.num_pages }}">{% trans "Last" %} &raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

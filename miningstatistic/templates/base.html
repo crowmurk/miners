@@ -1,0 +1,77 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            {% block title %}
+                Mining Statistic
+            {% endblock %}
+        </title>
+        <link rel="stylesheet" type="text/css" href="{% static 'site/normalize.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'site/skeleton.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'site/style.css' %}">
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container"><!-- container -->
+            <div class="status row">
+                <div class="offset-by-eight four columns">
+                    <ul class="inline">
+                        {% if user.is_authenticated %}
+                            <li>{{ user.get_username }}</li>
+                            <li><a href="{% url 'logout' %}">{% trans "LogOut" %}</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">{% trans "LogIn" %}</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <header class="row">
+                <div class="offset-by-one ten columns">
+                    <h1 class="logo">Mining Statistic</h1>
+                </div>
+                <div class="u-pull-right">
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ redirect_to }}" />
+                        <select class="inline" name="language" onchange="this.form.submit()">
+                            {% get_current_language as CURRENT_LANGUAGE  %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <option value="{{ language.code }}"
+                                        {% if language.code == CURRENT_LANGUAGE %} selected="selected"{% endif %}>
+                                {{ language.name_local }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </header>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'statistic:server:list' %}">{% trans "Statistic" %}</a></li>
+                    <li><a href="{% url 'task:server:list' %}">{% trans "Tasks" %}</a></li>
+                    <li><a href="{% url 'miner:server:list' %}">{% trans "Servers" %}</a></li>
+                    <li><a href="{% url 'miner:miner:list' %}">{% trans "Miners" %}</a></li>
+                    <li><a href="{% url 'underconstruction' %}">{% trans "Pools" %}</a></li>
+                    <li><a href="{% url 'task:config:list' %}">{% trans "Config" %}</a></li>
+                    <li><a href="{% url 'underconstruction' %}">{% trans "Contact" %}!</a></li>
+                </ul>
+            </nav>
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div><!-- container -->
+        <footer>
+            {% block footer %}
+            {% endblock %}
+            <p>&copy; 2018 <a href="http://localhost">varga</a></p>
+        </footer>
+    </body>
+</html>

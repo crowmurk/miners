@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Internal server error" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="offset-by-two eight columns">
+            <h1>{% trans "Internal server error" %}</h1>
+            <p>
+                {% trans "Do not mistake the one who does nothing." %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

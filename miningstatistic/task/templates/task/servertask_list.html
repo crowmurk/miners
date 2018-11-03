@@ -1,0 +1,47 @@
+{% extends "task/base_task.html" %}
+{% load i18n %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} - {{ view.model|verbose_name_plural }}
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'task:server:create' %}" class="button button-primary">{% trans "Create" %}</a>
+{% endblock %}
+
+{% block task_content %}
+    <div class="offset-by-two ten columns">
+        <h2>{{ view.model|verbose_name_plural }}</h2>
+        <ul>
+            {% for servertask in object_list %}
+                <li>
+                    <a href="{{ servertask.get_absolute_url }}">{{ servertask|verbose_name }} #{{ servertask.pk }}</a>
+                    : {{ servertask.server }}
+                    (
+                    {% for request in servertask.requests.all %}
+                        {{ request.name }},
+                    {% endfor %}
+                    )
+                    {{ servertask.enabled|yesno:_("<strong>Enabled</strong>,Disabled")|safe }}
+                    {% if servertask.executed %}
+                        - {{ servertask.executed }}
+                    {% endif %}
+                    - {{ servertask.status|yesno:_("Success,<strong>Failure</strong>,Unknown")|safe }}
+                    <ul class=inline>
+                        <li><a href="{{ servertask.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                        <li><a href="{{ servertask.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% blocktrans with model_name=view.model|verbose_name_plural %}
+                            No {{ model_name }} available
+                        {% endblocktrans %}
+                    </em>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

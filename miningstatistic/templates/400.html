@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Bad request" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="offset-by-two eight columns">
+            <h1>{% trans "Bad request" %}</h1>
+            <p>
+                {% blocktrans %}
+                    I do not get upset when people do not understand me,
+                    upset if I do not understand people."
+                {% endblocktrans %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

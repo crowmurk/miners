@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="offset-by-two eight columns">
+        {% if form.errors %}
+            <p>
+                {% blocktrans %}
+                    Your username and password didn't match.
+                    Please try again.
+                {% endblocktrans %}
+            </p>
+        {% endif %}
+
+        {% if next %}
+            {% if user.is_authenticated %}
+                <p>
+                    {% trans "Your account doesn't have access to this page." %}
+                </p>
+            {% else %}
+                <p>{% trans "Please login to see this page." %}</p>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div>
+                <td>{{ form.username.label_tag }}</td>
+                <td>{{ form.username }}</td>
+            </div>
+            <div>
+                <td>{{ form.password.label_tag }}</td>
+                <td>{{ form.password }}</td>
+            </div>
+            <div>
+                <input type="hidden" name="next" value="{{ next }}" />
+                <button class="button" type="submit">{% trans "LogIn" %}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

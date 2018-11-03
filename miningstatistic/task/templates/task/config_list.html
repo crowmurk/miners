@@ -1,0 +1,38 @@
+{% extends "task/base_task.html" %}
+{% load i18n %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} - {{ view.model|verbose_name_plural }}
+{% endblock %}
+
+{% block create_button %}
+    <a href="{% url 'task:config:create' %}" class="button button-primary">{% trans "Create" %}</a>
+{% endblock %}
+
+{% block task_content %}
+    <div class="offset-by-two ten columns">
+        <h2>{{ view.model|verbose_name_plural }}</h2>
+        <ul>
+            {% for config in object_list %}
+                <li>
+                    <a href="{{ config.get_absolute_url }}">{{ config.name }}</a>
+                        ({{ config.enabled|yesno:_("<strong>Enabled</strong>,Disabled")|safe }})
+                        {{ config.description }}
+                    <ul class=inline>
+                        <li><a href="{{ config.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                        <li><a href="{{ config.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% blocktrans with model_name=view.model|verbose_name_plural %}
+                            No {{ model_name }} available
+                        {% endblocktrans %}
+                    </em>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

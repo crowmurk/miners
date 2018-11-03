@@ -1,0 +1,57 @@
+{% extends "task/base_task.html" %}
+{% load i18n %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} – {{ servertask|verbose_name }} #{{ servertask.id }}
+{% endblock %}
+
+{% block content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eight columns">
+                <h3>{{ servertask|verbose_name }}: #{{ servertask.id }}</h3>
+                <ul class="inline">
+                    <li><a href="{{ servertask.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ servertask.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>{% field_verbose_name servertask 'enabled' %}:</strong></dt>
+                    <dd>{{ servertask.enabled|yesno:_('Enabled,Disabled') }}</dd>
+                    <dt><strong>{% field_verbose_name servertask 'executed' %}:</strong></dt>
+                    {% if servertask.executed %}
+                        <dd>{{ servertask.executed }}</dd>
+                    {% else %}
+                        <dd>{% trans "Never" %}</dd>
+                    {% endif %}
+                    <dt><strong>{% field_verbose_name servertask 'status' %}:</strong></dt>
+                    <dd>{{ servertask.status|yesno:_('Success,Failure,Unknown') }}</dd>
+                </dl>
+                <h5>{% trans "Settings" %}:</h5>
+                <dl>
+                    <dt><strong>{% field_verbose_name servertask 'server' %}:</strong></dt>
+                    <dd><a href="{{ servertask.server.get_absolute_url }}">{{ servertask.server.name }}</a></dd>
+                    <dt><strong>{% field_verbose_name servertask.server 'miner' %}:</strong></dt>
+                    <dd><a href="{{ servertask.server.miner.get_absolute_url }}">{{ servertask.server.miner }}</a></dd>
+                    <dt><strong>{% field_verbose_name servertask 'requests' %}:</strong></dt>
+                    {% for request in servertask.requests.all %}
+                        <dd><a href="{{ request.get_absolute_url }}">{{ request.name }}</a></dd>
+                    {% empty %}
+                        <li>
+                            <em>
+                                {% field_verbose_name servertask 'requests' as model_name  %}
+                                {% blocktrans %}
+                                    No {{ model_name }} available
+                                {% endblocktrans %}
+                            </em>
+                        </li>
+                    {% endfor %}
+                    {% if servertask.timeout %}
+                        <dt><strong>{% field_verbose_name servertask 'timeout' %}:</strong></dt>
+                        <dd>{{ servertask.timeout }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </article>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "miner/base_miner.html" %}
+{% load i18n %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} – {{ server|verbose_name }}: {{ server.name }}
+{% endblock %}
+
+{% block miner_content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eight columns">
+                <h3>{{ server|verbose_name }}: {{ server.name }}</h3>
+                <ul class="inline">
+                    <li><a href="{{ server.get_update_url }}" class="button">{% trans "Edit" %}</a></li>
+                    <li><a href="{{ server.get_delete_url }}" class="button">{% trans "Delete" %}</a></li>
+                </ul>
+                <dl>
+                    <dt><strong>{% field_verbose_name server 'host' %}:</strong></dt>
+                    <dd>{{ server.host }}</dd>
+                    {% if server.description %}
+                        <dt><strong>{% field_verbose_name server 'description' %}:</strong></dt>
+                        <dd>{{ server.description }}</dd>
+                    {% endif %}
+                    {% if server.miner %}
+                        <dt><strong>{% field_verbose_name server 'miner' %}:</strong></dt>
+                        <dd><a href="{{ server.miner.get_absolute_url }}">{{ server.miner }}</a></dd>
+                        <dt><strong>{% field_verbose_name server 'port' %}:</strong></dt>
+                        <dd>{{ server.port }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </article>
+{% endblock %}

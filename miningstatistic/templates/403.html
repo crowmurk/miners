@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Forbidden" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="offset-by-two eight columns">
+            <h1>{% trans "Forbidden" %}</h1>
+            <p>
+                {% trans "No things are forbidden, they are just not recommended." %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

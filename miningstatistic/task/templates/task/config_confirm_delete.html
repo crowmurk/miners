@@ -1,0 +1,12 @@
+{% extends "task/base_task.html" %}
+{% load i18n %}
+{% load forms %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} - {% trans "Delete" %} {{ config|verbose_name|lower }}
+{% endblock %}
+
+{% block content %}
+    {% delete_form config.get_delete_url %}
+{% endblock %}

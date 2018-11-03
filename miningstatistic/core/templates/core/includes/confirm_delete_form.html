@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="row">
+    <div class="offset-by-two eight columns">
+        <form action="{{ action }}" method="{{ method|default:'post' }}">
+            {% csrf_token %}
+            <p>{% trans "Are you sure you want to delete" %} {{ object_type|lower }}: "{{ object_name }}"?</p>
+            <a href="{{ object.get_absolute_url }}" class="button button-primary">{% trans "Cancel" %}</a>
+            <button type="submit">{% trans "Delete" %} {{ object_type }}</button>
+        </form>
+    </div>
+</div>

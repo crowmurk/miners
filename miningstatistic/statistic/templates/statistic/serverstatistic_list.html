@@ -1,0 +1,40 @@
+{% extends "statistic/base_statistic.html" %}
+{% load i18n %}
+{% load django_tables2 %}
+{% load names %}
+
+{% block title %}
+    {{ block.super }} - {{ view.model|verbose_name_plural }}
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <meta http-equiv="refresh" content="{{ update_interval }}" />
+{% endblock %}
+
+{% block statistic_content %}
+    {% for table in tables %}
+        {% if table.data %}
+            <h5 style="text-align:center">
+                {{ table.verbose_name_prefix }}
+                <a href="{{ table.miner.get_absolute_url }}">{{ table.miner }}</a>
+            </h5>
+            {% render_table table %}
+        {% endif %}
+    {% empty %}
+        <li>
+            <em>
+                {% blocktrans with model_name=view.model|verbose_name_plural %}
+                    No {{ model_name }} available
+                {% endblocktrans %}
+            </em>
+        </li>
+    {% endfor %}
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    {% blocktrans with now_t=now update_interval_t=update_interval %}
+        <p>Now: {{ now_t }} - Update interval: {{ update_interval_t }} sec.</p>
+    {% endblocktrans %}
+{% endblock %}
