@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-03 08:57+0300\n"
+"POT-Creation-Date: 2018-11-05 10:47+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,54 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: contact/forms.py:13
+msgid "Feedback"
+msgstr "Отзыв"
+
+#: contact/forms.py:14
+msgid "Correction"
+msgstr "Исправление"
+
+#: contact/forms.py:15
+msgid "Support"
+msgstr "Поддержка"
+
+#: contact/forms.py:20
+msgid "Reason"
+msgstr "Причина"
+
+#: contact/forms.py:25
+msgid "Email"
+msgstr "Адрес"
+
+#: contact/forms.py:29 statistic/tables.py:79
+msgid "Message"
+msgstr "Сообщение"
+
+#: contact/forms.py:38
+msgid "Message From"
+msgstr "Сообщение от"
+
+#: contact/forms.py:46
+msgid ""
+"Could Not Send Email.\n"
+"Extra Headers not allowed in email body."
+msgstr ""
+"Ошибка при отправке сообщения.\n"
+"Дополнительные заголовки не разрешены в теле писма."
+
+#: contact/templates/contact/contact_form.html:5 templates/base.html:63
+msgid "Contact"
+msgstr "Контакт"
+
+#: contact/templates/contact/contact_form.html:15
+msgid "Send email"
+msgstr "Отправить сообщение"
+
+#: contact/views.py:25
+msgid "Email successfully sent."
+msgstr "Сообщение успешно отправлено."
 
 #: core/templates/core/includes/confirm_delete_form.html:6
 msgid "Are you sure you want to delete"
@@ -233,11 +281,11 @@ msgstr ""
 "                            %(model_name)s не существует\n"
 "                        "
 
-#: miningstatistic/settings/base.py:112
+#: miningstatistic/settings/base.py:113
 msgid "Russian"
 msgstr "Русский"
 
-#: miningstatistic/settings/base.py:113
+#: miningstatistic/settings/base.py:114
 msgid "English"
 msgstr "Английский"
 
@@ -288,10 +336,6 @@ msgstr "Тип ошибки"
 #: statistic/tables.py:76
 msgid "Data"
 msgstr "Данные"
-
-#: statistic/tables.py:79
-msgid "Message"
-msgstr "Сообщение"
 
 #: statistic/templates/statistic/serverstatistic_list.html:27
 #, python-format
@@ -373,7 +417,7 @@ msgstr "Интервал запросов"
 
 #: task/models.py:55
 msgid "Request interval (sec.)."
-msgstr "Интервал запросов (сек.)"
+msgstr "Интервал запросов (сек.)."
 
 #: task/models.py:63
 msgid "Zabbix host"
@@ -420,8 +464,7 @@ msgstr "Включено"
 msgid ""
 "Only one config can be enabled at a time. \"%(name)s\" config is now enabled."
 msgstr ""
-"Только одна конфигурация может быть включена. Сейчас включена конфигурация "
-"\"%(name)s\"."
+"Только одна конфигурация может быть включена. Сейчас включена конфигурация \"%(name)s\"."
 
 #: task/models.py:182
 msgid "Timeout"
@@ -544,10 +587,6 @@ msgstr "Задачи"
 #: templates/base.html:62
 msgid "Config"
 msgstr "Конфигурация"
-
-#: templates/base.html:63
-msgid "Contact"
-msgstr "Контакт"
 
 #: templates/registration/logged_out.html:6
 msgid "Logged out!"

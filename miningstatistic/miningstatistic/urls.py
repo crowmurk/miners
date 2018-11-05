@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('statistic.urls')),
     path('miner/', include('miner.urls')),
     path('task/', include('task.urls')),
+    path('contact/', include('contact.urls')),
     path('underconstruction/', TemplateView.as_view(
         template_name='site/underconstruction.html'),
         name='underconstruction'),

@@ -93,3 +93,18 @@ LOGGING = {
         }
     },
 }
+
+# Email
+
+# Сообщения отображаются в консоли
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Поле 'From' если не указано
+DEFAULT_FROM_EMAIL = 'no-reply@doit.local'
+# Поле 'From' если отправлено ADMINS и MANAGERS
+SERVER_EMAIL = 'contact@doit.local'
+# Префикс темы сообщения
+EMAIL_SUBJECT_PREFIX = '[Mining Statistic] '
+# Поле 'To' если отправлено MANAGERS
+MANAGERS = (('Us', 'ourselves@doit.local'),)
+# Поле 'To' если отправлено ADMINS
+ADMINS = (('Admin', 'admin@doit.local'),)

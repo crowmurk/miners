@@ -1,0 +1,19 @@
+{% extends "contact/base_contact.html" %}
+{% load i18n %}
+
+{% block title %}
+    {{ block.super }} – {% trans "Contact" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="offset-by-two eight columns">
+            <form
+                action="{% url 'contact:contact' %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="button-primary" type="submit">{% trans "Send email" %}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -60,9 +60,25 @@
                     <li><a href="{% url 'miner:miner:list' %}">{% trans "Miners" %}</a></li>
                     <li><a href="{% url 'underconstruction' %}">{% trans "Pools" %}</a></li>
                     <li><a href="{% url 'task:config:list' %}">{% trans "Config" %}</a></li>
-                    <li><a href="{% url 'underconstruction' %}">{% trans "Contact" %}!</a></li>
+                    <li><a href="{% url 'contact:contact' %}">{% trans "Contact" %}!</a></li>
                 </ul>
             </nav>
+            {% if messages %}
+                <div class="row">
+                    <div class="twelve columns">
+                        <ul class="messages">
+                            {% for message in messages %}
+                                {% if message.tags %}
+                                    <li class="{{ message.tags }}">
+                                {% else %}
+                                    <li>
+                                {% endif %}
+                                {{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
             <main>
                 {% block content %}
                 {% endblock %}

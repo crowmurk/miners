@@ -43,6 +43,7 @@ LOCAL_APPS = [
     'pool.apps.PoolConfig',
     'task.apps.TaskConfig',
     'statistic.apps.StatisticConfig',
+    'contact.apps.ContactConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
