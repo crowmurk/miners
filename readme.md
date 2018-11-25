@@ -23,12 +23,6 @@ git clone https://github.com/crowmurk/miners
 cd miners
 ```
 
-Switch to the `develop-django` branch:
-
-```bash
-git checkout develop-django
-```
-
 Upgrade `pip`:
 
 ```bash
@@ -96,12 +90,6 @@ source bin/activate
 ```bash
 git clone https://github.com/crowmurk/miners
 cd miners
-```
-
-Переключаемся на ветку `develop-django`:
-
-```bash
-git checkout develop-django
 ```
 
 Обновляем `pip`:
